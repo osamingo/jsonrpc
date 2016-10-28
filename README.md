@@ -1,0 +1,103 @@
+# jsonrpc
+
+[![CircleCI](https://img.shields.io/circleci/project/osamingo/jsonrpc/master.svg)](https://circleci.com/gh/osamingo/jsonrpc)
+[![codecov](https://codecov.io/gh/osamingo/jsonrpc/branch/master/graph/badge.svg)](https://codecov.io/gh/osamingo/jsonrpc)
+[![Go Report Card](https://goreportcard.com/badge/osamingo/jsonrpc)](https://goreportcard.com/report/osamingo/jsonrpc)
+[![codebeat badge](https://codebeat.co/badges/cbd0290d-200b-4693-80dc-296d9447c35b)](https://codebeat.co/projects/github-com-osamingo-jsonrpc)
+[![GoDoc](https://godoc.org/github.com/osamingo/jsonrpc?status.svg)](https://godoc.org/github.com/osamingo/jsonrpc)
+[![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/osamingo/jsonrpc/master/LICENSE)
+
+## About
+
+- Simple implements
+- No `reflect` package
+- Compliance with JSON-RPC 2.0
+
+## Install
+
+```
+$ go get -u github.com/osamingo/jsonrpc
+```
+
+## Usage
+
+```go
+package main
+
+import (
+	"context"
+	"encoding/json"
+	"log"
+	"net/http"
+
+	"github.com/osamingo/jsonrpc"
+)
+
+type (
+	EchoParams struct {
+		Name string `json:"name"`
+	}
+	EchoResult struct {
+		Message string `json:"message"`
+	}
+)
+
+func Echo(c context.Context, params *json.RawMessage) (interface{}, *jsonrpc.Error) {
+
+	var p EchoParams
+	if err := json.Unmarshal(*params, &p); err != nil {
+		return nil, jsonrpc.ErrInvalidParams()
+	}
+
+	return EchoResult{
+		Message: "Hello, " + p.Name,
+	}, nil
+}
+
+func JSONRPC(w http.ResponseWriter, r *http.Request) {
+
+	rs, err := jsonrpc.ParseRequest(r)
+	if err != nil {
+		jsonrpc.SendResponse(w, []jsonrpc.Response{
+			{
+				Version: jsonrpc.Version,
+				Error:   err,
+			},
+		})
+		return
+	}
+
+	resp := make([]jsonrpc.Response, 0, len(rs))
+	for i := range rs {
+		var f jsonrpc.Func
+		res := jsonrpc.NewResponse(rs[i])
+		f, res.Error = jsonrpc.TakeMethod(rs[i])
+		if res.Error != nil {
+			resp = append(resp, res)
+			continue
+		}
+
+		res.Result, res.Error = f(r.Context(), rs[i].Params)
+		resp = append(resp, res)
+	}
+
+	if err := jsonrpc.SendResponse(w, resp); err != nil {
+		log.Println(err)
+	}
+}
+
+func init() {
+	jsonrpc.RegisterMethod("Echo", Echo)
+}
+
+func main() {
+	http.HandleFunc("/_jr", JSONRPC)
+	if err := http.ListenAndServe(":8080", nil); err != nil {
+		log.Fatalln(err)
+	}
+}
+```
+
+## License
+
+Released under the [MIT License](https://github.com/osamingo/jsonrpc/blob/master/LICENSE).
