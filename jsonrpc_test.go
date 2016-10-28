@@ -14,51 +14,53 @@ func TestParseRequest(t *testing.T) {
 
 	r, _ := http.NewRequest("", "", bytes.NewReader(nil))
 
-	_, err := ParseRequest(r)
+	_, _, err := ParseRequest(r)
 	require.IsType(t, &Error{}, err)
 	assert.Equal(t, ErrorCodeInvalidRequest, err.Code)
 
 	r.Header.Set("Content-Type", "application/json")
 
-	_, err = ParseRequest(r)
+	_, _, err = ParseRequest(r)
 	require.IsType(t, &Error{}, err)
 	assert.Equal(t, ErrorCodeInvalidRequest, err.Code)
 
 	r, _ = http.NewRequest("", "", bytes.NewReader([]byte("")))
 	r.Header.Set("Content-Type", "application/json")
-	_, err = ParseRequest(r)
+	_, _, err = ParseRequest(r)
 	require.IsType(t, &Error{}, err)
 	assert.Equal(t, ErrorCodeInvalidRequest, err.Code)
 
 	r, _ = http.NewRequest("", "", bytes.NewReader([]byte("test")))
 	r.Header.Set("Content-Type", "application/json")
-	_, err = ParseRequest(r)
+	_, _, err = ParseRequest(r)
 	require.IsType(t, &Error{}, err)
 	assert.Equal(t, ErrorCodeParse, err.Code)
 
 	r, _ = http.NewRequest("", "", bytes.NewReader([]byte("{}")))
 	r.Header.Set("Content-Type", "application/json")
-	rs, err := ParseRequest(r)
+	rs, batch, err := ParseRequest(r)
 	require.Nil(t, err)
 	require.NotEmpty(t, rs)
+	assert.False(t, batch)
 
 	r, _ = http.NewRequest("", "", bytes.NewReader([]byte("[")))
 	r.Header.Set("Content-Type", "application/json")
-	_, err = ParseRequest(r)
+	_, _, err = ParseRequest(r)
 	require.IsType(t, &Error{}, err)
 	assert.Equal(t, ErrorCodeParse, err.Code)
 
 	r, _ = http.NewRequest("", "", bytes.NewReader([]byte("[test]")))
 	r.Header.Set("Content-Type", "application/json")
-	_, err = ParseRequest(r)
+	_, _, err = ParseRequest(r)
 	require.IsType(t, &Error{}, err)
 	assert.Equal(t, ErrorCodeParse, err.Code)
 
 	r, _ = http.NewRequest("", "", bytes.NewReader([]byte("[{}]")))
 	r.Header.Set("Content-Type", "application/json")
-	rs, err = ParseRequest(r)
+	rs, batch, err = ParseRequest(r)
 	require.Nil(t, err)
 	require.NotEmpty(t, rs)
+	assert.True(t, batch)
 }
 
 func TestNewResponse(t *testing.T) {
@@ -73,7 +75,7 @@ func TestNewResponse(t *testing.T) {
 func TestSendResponse(t *testing.T) {
 
 	rec := httptest.NewRecorder()
-	err := SendResponse(rec, []Response{})
+	err := SendResponse(rec, []Response{}, false)
 	require.NoError(t, err)
 	assert.Empty(t, rec.Body.String())
 
@@ -88,12 +90,17 @@ func TestSendResponse(t *testing.T) {
 	}
 
 	rec = httptest.NewRecorder()
-	err = SendResponse(rec, []Response{r})
+	err = SendResponse(rec, []Response{r}, false)
 	require.NoError(t, err)
 	assert.Equal(t, `{"id":"test","jsonrpc":"2.0","result":{"name":"john"}}`, rec.Body.String())
 
 	rec = httptest.NewRecorder()
-	err = SendResponse(rec, []Response{r, r})
+	err = SendResponse(rec, []Response{r}, true)
+	require.NoError(t, err)
+	assert.Equal(t, `[{"id":"test","jsonrpc":"2.0","result":{"name":"john"}}]`, rec.Body.String())
+
+	rec = httptest.NewRecorder()
+	err = SendResponse(rec, []Response{r, r}, false)
 	require.NoError(t, err)
 	assert.Equal(t, `[{"id":"test","jsonrpc":"2.0","result":{"name":"john"}},{"id":"test","jsonrpc":"2.0","result":{"name":"john"}}]`, rec.Body.String())
 }

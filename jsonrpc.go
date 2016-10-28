@@ -38,40 +38,40 @@ type (
 )
 
 // ParseRequest parses a HTTP request to JSON-RPC request.
-func ParseRequest(r *http.Request) ([]Request, *Error) {
+func ParseRequest(r *http.Request) ([]Request, bool, *Error) {
 
 	if r.Header.Get(contentTypeKey) != contentTypeValue {
-		return nil, ErrInvalidRequest()
+		return nil, false, ErrInvalidRequest()
 	}
 
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		return nil, ErrInvalidRequest()
+		return nil, false, ErrInvalidRequest()
 	}
 	r.Body.Close()
 
 	if len(body) == 0 {
-		return nil, ErrInvalidRequest()
+		return nil, false, ErrInvalidRequest()
 	}
 
 	if body[0] != batchRequestPrefixKey {
 		var req Request
 		if err = json.Unmarshal(body, &req); err != nil {
-			return nil, ErrParse()
+			return nil, false, ErrParse()
 		}
-		return []Request{req}, nil
+		return []Request{req}, false, nil
 	}
 
 	if body[len(body)-1] != batchRequestSuffixKey {
-		return nil, ErrParse()
+		return nil, false, ErrParse()
 	}
 
 	rs := []Request{}
 	if err = json.Unmarshal(body, &rs); err != nil {
-		return nil, ErrParse()
+		return nil, false, ErrParse()
 	}
 
-	return rs, nil
+	return rs, true, nil
 }
 
 // NewResponse generates a JSON-RPC response.
@@ -86,13 +86,19 @@ func NewResponse(r Request) Response {
 }
 
 // SendResponse writes JSON-RPC response.
-func SendResponse(w http.ResponseWriter, resp []Response) error {
+func SendResponse(w http.ResponseWriter, resp []Response, batch bool) error {
+
+	w.Header().Set(contentTypeKey, contentTypeValue)
+
+	if len(resp) == 0 {
+		return nil
+	}
 
 	var bin []byte
 	var err error
-	if len(resp) == 1 {
+	if !batch && len(resp) == 1 {
 		bin, err = json.Marshal(&resp[0])
-	} else if len(resp) > 1 {
+	} else {
 		bin, err = json.Marshal(&resp)
 	}
 
@@ -100,7 +106,6 @@ func SendResponse(w http.ResponseWriter, resp []Response) error {
 		return err
 	}
 
-	w.Header().Set(contentTypeKey, contentTypeValue)
 	w.Write(bin)
 
 	return nil

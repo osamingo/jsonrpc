@@ -11,7 +11,7 @@
 
 - Simple implements
 - No `reflect` package
-- Compliance with JSON-RPC 2.0
+- Compliance with [JSON-RPC 2.0](http://www.jsonrpc.org/specification)
 
 ## Install
 
@@ -54,44 +54,12 @@ func Echo(c context.Context, params *json.RawMessage) (interface{}, *jsonrpc.Err
 	}, nil
 }
 
-func JSONRPC(w http.ResponseWriter, r *http.Request) {
-
-	rs, err := jsonrpc.ParseRequest(r)
-	if err != nil {
-		jsonrpc.SendResponse(w, []jsonrpc.Response{
-			{
-				Version: jsonrpc.Version,
-				Error:   err,
-			},
-		})
-		return
-	}
-
-	resp := make([]jsonrpc.Response, 0, len(rs))
-	for i := range rs {
-		var f jsonrpc.Func
-		res := jsonrpc.NewResponse(rs[i])
-		f, res.Error = jsonrpc.TakeMethod(rs[i])
-		if res.Error != nil {
-			resp = append(resp, res)
-			continue
-		}
-
-		res.Result, res.Error = f(r.Context(), rs[i].Params)
-		resp = append(resp, res)
-	}
-
-	if err := jsonrpc.SendResponse(w, resp); err != nil {
-		log.Println(err)
-	}
-}
-
 func init() {
 	jsonrpc.RegisterMethod("Echo", Echo)
 }
 
 func main() {
-	http.HandleFunc("/_jr", JSONRPC)
+	http.HandleFunc("/_jr", jsonrpc.Handler)
 	if err := http.ListenAndServe(":8080", nil); err != nil {
 		log.Fatalln(err)
 	}
