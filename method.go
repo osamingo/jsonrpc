@@ -5,7 +5,7 @@ import (
 	"sync"
 )
 
-// A MethodRepository is management JSON-RPC method functions.
+// A MethodRepository has JSON-RPC method functions.
 type MethodRepository struct {
 	m sync.RWMutex
 	r map[string]Func
@@ -35,7 +35,7 @@ func TakeMethod(r Request) (Func, *Error) {
 // RegisterMethod registers jsonrpc.Func to MethodRepository.
 func RegisterMethod(method string, f Func) error {
 	if method == "" || f == nil {
-		return errors.New("jsonrpc: method and function should not be empty")
+		return errors.New("jsonrpc: method name and function should not be empty")
 	}
 	mr.m.Lock()
 	mr.r[method] = f

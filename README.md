@@ -9,9 +9,10 @@
 
 ## About
 
-- Simple implements
-- No `reflect` package
-- Compliance with [JSON-RPC 2.0](http://www.jsonrpc.org/specification)
+- Simple implements.
+- No `reflect` package.
+- Support both package `context` and `golang.org/x/net/context`.
+- Compliance with [JSON-RPC 2.0](http://www.jsonrpc.org/specification).
 
 ## Install
 
