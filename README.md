@@ -1,6 +1,6 @@
 # jsonrpc
 
-[![CircleCI](https://img.shields.io/circleci/project/osamingo/jsonrpc/master.svg)](https://circleci.com/gh/osamingo/jsonrpc)
+[![Travis branch](https://img.shields.io/travis/osamingo/jsonrpc/master.svg)](https://travis-ci.org/osamingo/jsonrpc)
 [![codecov](https://codecov.io/gh/osamingo/jsonrpc/branch/master/graph/badge.svg)](https://codecov.io/gh/osamingo/jsonrpc)
 [![Go Report Card](https://goreportcard.com/badge/osamingo/jsonrpc)](https://goreportcard.com/report/osamingo/jsonrpc)
 [![codebeat badge](https://codebeat.co/badges/cbd0290d-200b-4693-80dc-296d9447c35b)](https://codebeat.co/projects/github-com-osamingo-jsonrpc)
@@ -11,7 +11,7 @@
 
 - Simple implements.
 - No `reflect` package.
-- Support both package `context` and `golang.org/x/net/context`.
+- Support both packages `context` and `golang.org/x/net/context`.
 - Compliance with [JSON-RPC 2.0](http://www.jsonrpc.org/specification).
 
 ## Install

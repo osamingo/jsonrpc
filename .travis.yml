@@ -1,0 +1,21 @@
+sudo: required
+dist: trusty
+
+language: go
+go:
+  - 1.6
+  - 1.7
+
+before_install:
+  - sudo add-apt-repository ppa:masterminds/glide -y
+  - sudo apt-get update
+  - sudo apt-get install glide -y
+
+install:
+  - glide install
+
+script:
+  - go test -race -covermode=atomic -coverprofile=coverage.txt .
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
