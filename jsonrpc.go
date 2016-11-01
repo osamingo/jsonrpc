@@ -2,8 +2,8 @@ package jsonrpc
 
 import (
 	"encoding/json"
-	"io/ioutil"
 	"net/http"
+	"bytes"
 )
 
 const (
@@ -44,30 +44,32 @@ func ParseRequest(r *http.Request) ([]Request, bool, *Error) {
 		return nil, false, ErrInvalidRequest()
 	}
 
-	body, err := ioutil.ReadAll(r.Body)
-	if err != nil {
+	buf := bytes.NewBuffer(make([]byte, 0, r.ContentLength))
+	if _, err := buf.ReadFrom(r.Body); err != nil {
 		return nil, false, ErrInvalidRequest()
 	}
 	r.Body.Close()
 
-	if len(body) == 0 {
+	if buf.Len() == 0 {
 		return nil, false, ErrInvalidRequest()
 	}
 
+	body := buf.Bytes()
+	buf.Reset()
 	if body[0] != batchRequestPrefixKey {
 		var req Request
-		if err = json.Unmarshal(body, &req); err != nil {
+		if err := json.Unmarshal(body, &req); err != nil {
 			return nil, false, ErrParse()
 		}
 		return []Request{req}, false, nil
 	}
 
 	if body[len(body)-1] != batchRequestSuffixKey {
-		return nil, false, ErrParse()
+		return nil, false, ErrInvalidRequest()
 	}
 
-	rs := []Request{}
-	if err = json.Unmarshal(body, &rs); err != nil {
+	var rs []Request
+	if err := json.Unmarshal(body, &rs); err != nil {
 		return nil, false, ErrParse()
 	}
 

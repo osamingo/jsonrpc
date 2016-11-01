@@ -47,7 +47,7 @@ func TestParseRequest(t *testing.T) {
 	r.Header.Set("Content-Type", "application/json")
 	_, _, err = ParseRequest(r)
 	require.IsType(t, &Error{}, err)
-	assert.Equal(t, ErrorCodeParse, err.Code)
+	assert.Equal(t, ErrorCodeInvalidRequest, err.Code)
 
 	r, _ = http.NewRequest("", "", bytes.NewReader([]byte("[test]")))
 	r.Header.Set("Content-Type", "application/json")
