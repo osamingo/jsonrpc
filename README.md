@@ -9,7 +9,7 @@
 
 ## About
 
-- Simple implements.
+- Simple implements ;)
 - No `reflect` package.
 - Support both packages `context` and `golang.org/x/net/context`.
 - Compliance with [JSON-RPC 2.0](http://www.jsonrpc.org/specification).
@@ -46,8 +46,8 @@ type (
 func Echo(c context.Context, params *json.RawMessage) (interface{}, *jsonrpc.Error) {
 
 	var p EchoParams
-	if err := json.Unmarshal(*params, &p); err != nil {
-		return nil, jsonrpc.ErrInvalidParams()
+	if err := jsonrpc.Unmarshal(params, &p); err != nil {
+		return nil, err
 	}
 
 	return EchoResult{
@@ -60,7 +60,7 @@ func init() {
 }
 
 func main() {
-	http.HandleFunc("/_jr", jsonrpc.Handler)
+	http.HandleFunc("/v1/jrpc", jsonrpc.Handler)
 	if err := http.ListenAndServe(":8080", nil); err != nil {
 		log.Fatalln(err)
 	}

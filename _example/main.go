@@ -21,8 +21,8 @@ type (
 func Echo(c context.Context, params *json.RawMessage) (interface{}, *jsonrpc.Error) {
 
 	var p EchoParams
-	if err := json.Unmarshal(*params, &p); err != nil {
-		return nil, jsonrpc.ErrInvalidParams()
+	if err := jsonrpc.Unmarshal(params, &p); err != nil {
+		return nil, err
 	}
 
 	return EchoResult{
@@ -35,7 +35,7 @@ func init() {
 }
 
 func main() {
-	http.HandleFunc("/_jr", jsonrpc.Handler)
+	http.HandleFunc("/v1/jrpc", jsonrpc.Handler)
 	if err := http.ListenAndServe(":8080", nil); err != nil {
 		log.Fatalln(err)
 	}
