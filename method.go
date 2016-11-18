@@ -3,6 +3,9 @@ package jsonrpc
 import (
 	"errors"
 	"sync"
+	"runtime"
+	"reflect"
+	"path"
 )
 
 // A MethodRepository has JSON-RPC method functions.
@@ -41,4 +44,15 @@ func RegisterMethod(method string, f Func) error {
 	mr.r[method] = f
 	mr.m.Unlock()
 	return nil
+}
+
+// MethodList returns registered method list.
+func MethodList() map[string]string {
+	mr.m.RLock()
+	ml := make(map[string]string, len(mr.r))
+	for k, f := range mr.r {
+		ml[k] = path.Base(runtime.FuncForPC(reflect.ValueOf(f).Pointer()).Name())
+	}
+	mr.m.RUnlock()
+	return ml
 }

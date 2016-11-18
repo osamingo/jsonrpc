@@ -1,22 +1,19 @@
 package jsonrpc
 
 import (
+	"bytes"
 	"encoding/json"
 	"net/http"
-	"bytes"
 )
 
 const (
 	// Version is JSON-RPC 2.0.
 	Version = "2.0"
 
-	contentTypeKey   = "Content-Type"
-	contentTypeValue = "application/json"
-)
-
-var (
-	batchRequestPrefixKey = byte('[')
-	batchRequestSuffixKey = byte(']')
+	batchRequestPrefixKey = '['
+	batchRequestSuffixKey = ']'
+	contentTypeKey        = "Content-Type"
+	contentTypeValue      = "application/json"
 )
 
 type (
@@ -108,7 +105,7 @@ func SendResponse(w http.ResponseWriter, resp []Response, batch bool) error {
 		return err
 	}
 
-	w.Write(bin)
+	_, err = w.Write(bin)
 
-	return nil
+	return err
 }

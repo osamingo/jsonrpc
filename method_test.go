@@ -45,8 +45,20 @@ func TestRegisterMethod(t *testing.T) {
 	err = RegisterMethod("test", nil)
 	require.Error(t, err)
 
-	err = RegisterMethod("test", func(c context.Context, params *json.RawMessage) (result interface{}, err *Error) {
-		return nil, nil
-	})
+	err = RegisterMethod("test", SampleFunc)
 	require.NoError(t, err)
+}
+
+func TestMethodList(t *testing.T) {
+
+	err := RegisterMethod("JsonRpc.Sample", SampleFunc)
+	require.NoError(t, err)
+
+	ml := MethodList()
+	require.NotEmpty(t, ml)
+	assert.Equal(t, "jsonrpc.SampleFunc", ml["JsonRpc.Sample"])
+}
+
+func SampleFunc(c context.Context, params *json.RawMessage) (result interface{}, err *Error) {
+	return nil, nil
 }
