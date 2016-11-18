@@ -16,6 +16,8 @@ import (
 
 func TestHandler17(t *testing.T) {
 
+	PurgeMethods()
+
 	rec := httptest.NewRecorder()
 	r, err := http.NewRequest("", "", nil)
 	require.NoError(t, err)

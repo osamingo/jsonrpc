@@ -16,6 +16,8 @@ import (
 
 func TestHandler(t *testing.T) {
 
+	PurgeMethods()
+
 	c := context.Background()
 	rec := httptest.NewRecorder()
 	r, err := http.NewRequest("", "", nil)
