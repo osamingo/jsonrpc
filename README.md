@@ -61,6 +61,7 @@ func init() {
 
 func main() {
 	http.HandleFunc("/v1/jrpc", jsonrpc.Handler)
+	http.HandleFunc("/v1/jrpc/debug", jsonrpc.DebugHandler)
 	if err := http.ListenAndServe(":8080", nil); err != nil {
 		log.Fatalln(err)
 	}
