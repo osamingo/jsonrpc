@@ -49,12 +49,12 @@ func TestRegisterMethod(t *testing.T) {
 	require.NoError(t, err)
 }
 
-func TestMethodList(t *testing.T) {
+func TestMethods(t *testing.T) {
 
 	err := RegisterMethod("JsonRpc.Sample", SampleFunc)
 	require.NoError(t, err)
 
-	ml := MethodList()
+	ml := Methods()
 	require.NotEmpty(t, ml)
 	assert.Equal(t, "jsonrpc.SampleFunc", ml["JsonRpc.Sample"])
 }

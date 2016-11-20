@@ -2,17 +2,24 @@ package jsonrpc
 
 import (
 	"errors"
-	"sync"
-	"runtime"
-	"reflect"
 	"path"
+	"reflect"
+	"runtime"
+	"sync"
 )
 
-// A MethodRepository has JSON-RPC method functions.
-type MethodRepository struct {
-	m sync.RWMutex
-	r map[string]Func
-}
+type (
+	// A MethodRepository has JSON-RPC method functions.
+	MethodRepository struct {
+		m sync.RWMutex
+		r map[string]Func
+	}
+	// Metadata has method name and function name.
+	Metadata struct {
+		Method   string `json:"method"`
+		Function string `json:"function"`
+	}
+)
 
 var mr = MethodRepository{
 	m: sync.RWMutex{},
@@ -46,8 +53,8 @@ func RegisterMethod(method string, f Func) error {
 	return nil
 }
 
-// MethodList returns registered method list.
-func MethodList() map[string]string {
+// Methods returns registered methods.
+func Methods() map[string]string {
 	mr.m.RLock()
 	ml := make(map[string]string, len(mr.r))
 	for k, f := range mr.r {
@@ -55,4 +62,11 @@ func MethodList() map[string]string {
 	}
 	mr.m.RUnlock()
 	return ml
+}
+
+// PurgeMethods purges all registered methods.
+func PurgeMethods() {
+	mr.m.Lock()
+	mr.r = map[string]Func{}
+	mr.m.Unlock()
 }
