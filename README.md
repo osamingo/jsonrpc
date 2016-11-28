@@ -69,6 +69,102 @@ func main() {
 }
 ```
 
+### Result
+
+#### Invoke the Echo method
+
+```
+POST /v1/jrpc HTTP/1.1
+Accept: application/json, */*
+Accept-Encoding: gzip, deflate
+Connection: keep-alive
+Content-Length: 82
+Content-Type: application/json
+Host: localhost:8080
+User-Agent: HTTPie/0.9.6
+
+{
+  "jsonrpc": "2.0",
+  "method": "Echo",
+  "params": {
+    "name": "John Doe"
+  },
+  "id": "243a718a-2ebb-4e32-8cc8-210c39e8a14b"
+}
+
+HTTP/1.1 200 OK
+Content-Length: 68
+Content-Type: application/json
+Date: Mon, 28 Nov 2016 13:48:13 GMT
+
+{
+  "jsonrpc": "2.0",
+  "result": {
+    "message": "Hello, John Doe"
+  },
+  "id": "243a718a-2ebb-4e32-8cc8-210c39e8a14b"
+}
+```
+
+#### Access to debug handler
+
+```
+GET /v1/jrpc/debug HTTP/1.1
+Accept: */*
+Accept-Encoding: gzip, deflate
+Connection: keep-alive
+Host: localhost:8080
+User-Agent: HTTPie/0.9.6
+
+
+
+HTTP/1.1 200 OK
+Content-Length: 408
+Content-Type: application/json
+Date: Mon, 28 Nov 2016 13:56:24 GMT
+
+[
+  {
+    "name": "Echo",
+    "function": "main.Echo",
+    "params": {
+      "$ref": "#/definitions/EchoParams",
+      "definitions": {
+        "EchoParams": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "name"
+          ]
+        }
+      }
+    },
+    "result": {
+      "$ref": "#/definitions/EchoResult",
+      "definitions": {
+        "EchoResult": {
+          "type": "object",
+          "properties": {
+            "message": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "message"
+          ]
+        }
+      }
+    }
+  }
+]
+```
+
 ## License
 
 Released under the [MIT License](https://github.com/osamingo/jsonrpc/blob/master/LICENSE).
