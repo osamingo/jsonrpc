@@ -42,7 +42,7 @@ func TestHandler17(t *testing.T) {
 
 	require.NoError(t, RegisterMethod("hello", func(c context.Context, params *json.RawMessage) (interface{}, *Error) {
 		return "hello", nil
-	}))
+	}, nil, nil))
 
 	rec = httptest.NewRecorder()
 	r, err = http.NewRequest("", "", bytes.NewReader([]byte(`{"jsonrpc":"2.0","id":"test","method":"hello","params":{}}`)))
