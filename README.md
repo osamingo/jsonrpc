@@ -12,6 +12,7 @@
 - Simple implements ;)
 - No `reflect` package.
 - Support both packages `context` and `golang.org/x/net/context`.
+- Support GAE/Go Standard Environment.
 - Compliance with [JSON-RPC 2.0](http://www.jsonrpc.org/specification).
 
 ## Install
@@ -56,7 +57,7 @@ func Echo(c context.Context, params *json.RawMessage) (interface{}, *jsonrpc.Err
 }
 
 func init() {
-	jsonrpc.RegisterMethod("Echo", Echo)
+	jsonrpc.RegisterMethod("Echo", Echo, EchoParams{}, EchoResult{})
 }
 
 func main() {

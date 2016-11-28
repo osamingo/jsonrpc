@@ -30,7 +30,7 @@ func TestTakeMethod(t *testing.T) {
 
 	require.NoError(t, RegisterMethod("test", func(c context.Context, params *json.RawMessage) (result interface{}, err *Error) {
 		return nil, nil
-	}))
+	}, nil, nil))
 
 	f, err := TakeMethod(r)
 	require.Nil(t, err)
@@ -39,24 +39,24 @@ func TestTakeMethod(t *testing.T) {
 
 func TestRegisterMethod(t *testing.T) {
 
-	err := RegisterMethod("", nil)
+	err := RegisterMethod("", nil, nil, nil)
 	require.Error(t, err)
 
-	err = RegisterMethod("test", nil)
+	err = RegisterMethod("test", nil, nil, nil)
 	require.Error(t, err)
 
-	err = RegisterMethod("test", SampleFunc)
+	err = RegisterMethod("test", SampleFunc, nil, nil)
 	require.NoError(t, err)
 }
 
 func TestMethods(t *testing.T) {
 
-	err := RegisterMethod("JsonRpc.Sample", SampleFunc)
+	err := RegisterMethod("JsonRpc.Sample", SampleFunc, nil, nil)
 	require.NoError(t, err)
 
 	ml := Methods()
 	require.NotEmpty(t, ml)
-	assert.Equal(t, "jsonrpc.SampleFunc", ml["JsonRpc.Sample"])
+	assert.NotEmpty(t, ml["JsonRpc.Sample"].Func)
 }
 
 func SampleFunc(c context.Context, params *json.RawMessage) (result interface{}, err *Error) {

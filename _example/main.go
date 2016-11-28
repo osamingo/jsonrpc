@@ -31,7 +31,7 @@ func Echo(c context.Context, params *json.RawMessage) (interface{}, *jsonrpc.Err
 }
 
 func init() {
-	jsonrpc.RegisterMethod("Echo", Echo)
+	jsonrpc.RegisterMethod("Echo", Echo, EchoParams{}, EchoResult{})
 }
 
 func main() {
