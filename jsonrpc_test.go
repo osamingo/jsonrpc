@@ -2,6 +2,7 @@ package jsonrpc
 
 import (
 	"bytes"
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -64,12 +65,13 @@ func TestParseRequest(t *testing.T) {
 }
 
 func TestNewResponse(t *testing.T) {
+	id := json.RawMessage("test")
 	r := NewResponse(Request{
 		Version: "2.0",
-		ID:      "test",
+		ID:      &id,
 	})
 	assert.Equal(t, "2.0", r.Version)
-	assert.Equal(t, "test", r.ID)
+	assert.Equal(t, "test", string(*r.ID))
 }
 
 func TestSendResponse(t *testing.T) {
@@ -79,8 +81,9 @@ func TestSendResponse(t *testing.T) {
 	require.NoError(t, err)
 	assert.Empty(t, rec.Body.String())
 
+	id := json.RawMessage([]byte(`"test"`))
 	r := Response{
-		ID:      "test",
+		ID:      &id,
 		Version: "2.0",
 		Result: struct {
 			Name string `json:"name"`

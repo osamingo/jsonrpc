@@ -19,7 +19,7 @@ const (
 type (
 	// A Request represents a JSON-RPC request received by the server.
 	Request struct {
-		ID      string           `json:"id"`
+		ID      *json.RawMessage `json:"id"`
 		Version string           `json:"jsonrpc"`
 		Method  string           `json:"method"`
 		Params  *json.RawMessage `json:"params"`
@@ -27,10 +27,10 @@ type (
 
 	// A Response represents a JSON-RPC response returned by the server.
 	Response struct {
-		ID      string      `json:"id"`
-		Version string      `json:"jsonrpc"`
-		Result  interface{} `json:"result,omitempty"`
-		Error   *Error      `json:"error,omitempty"`
+		ID      *json.RawMessage `json:"id,omitempty"`
+		Version string           `json:"jsonrpc"`
+		Result  interface{}      `json:"result,omitempty"`
+		Error   *Error           `json:"error,omitempty"`
 	}
 )
 
@@ -78,7 +78,7 @@ func NewResponse(r Request) Response {
 	res := Response{
 		Version: r.Version,
 	}
-	if r.ID != "" {
+	if r.ID != nil {
 		res.ID = r.ID
 	}
 	return res
