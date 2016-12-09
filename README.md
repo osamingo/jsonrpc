@@ -9,8 +9,9 @@
 
 ## About
 
-- Simple implements ;)
+- Simple, Poetic, Pithy.
 - No `reflect` package.
+  - But `reflect` package is used only when invoke the debug handler.
 - Support both packages `context` and `golang.org/x/net/context`.
 - Support GAE/Go Standard Environment.
 - Compliance with [JSON-RPC 2.0](http://www.jsonrpc.org/specification).
