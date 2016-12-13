@@ -28,12 +28,17 @@ func DebugHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	l := make([]MethodReference, 0, len(ms))
 	for k, md := range ms {
-		l = append(l, MethodReference{
+		mr := MethodReference{
 			Name:     k,
 			Function: path.Base(runtime.FuncForPC(reflect.ValueOf(md.Func).Pointer()).Name()),
-			Params:   jsonschema.Reflect(md.Params),
-			Result:   jsonschema.Reflect(md.Result),
-		})
+		}
+		if md.Params != nil {
+			mr.Params = jsonschema.Reflect(md.Params)
+		}
+		if md.Result != nil {
+			mr.Result = jsonschema.Reflect(md.Result)
+		}
+		l = append(l, mr)
 	}
 	b, err := json.Marshal(l)
 	if err != nil {
