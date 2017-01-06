@@ -2,7 +2,13 @@
 
 package jsonrpc
 
-import "net/http"
+import (
+	"context"
+	"net/http"
+)
+
+// Filter runs before invoke a method.
+var Filter func(context.Context, *Request) *Error
 
 // Handler provides basic JSON-RPC handling.
 func Handler(w http.ResponseWriter, r *http.Request) {
@@ -26,6 +32,14 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 		if res.Error != nil {
 			resp[i] = res
 			continue
+		}
+
+		if Filter != nil {
+			res.Error = Filter(r.Context(), &rs[i])
+			if res.Error != nil {
+				resp[i] = res
+				continue
+			}
 		}
 
 		res.Result, res.Error = f(r.Context(), rs[i].Params)
