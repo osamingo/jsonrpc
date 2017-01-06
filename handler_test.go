@@ -56,4 +56,37 @@ func TestHandler(t *testing.T) {
 	require.NoError(t, err)
 	assert.Nil(t, res.Error)
 	assert.Equal(t, "hello", res.Result)
+
+	// Filtering
+
+	rec = httptest.NewRecorder()
+	r, err = http.NewRequest("", "", bytes.NewReader([]byte(`{"jsonrpc":"2.0","id":"test","method":"hello","params":{}}`)))
+	require.NoError(t, err)
+	r.Header.Set("Content-Type", "application/json")
+
+	Filter = func(c context.Context, r *Request) *Error {
+		return nil
+	}
+
+	Handler(c, rec, r)
+	res = Response{}
+	err = json.NewDecoder(rec.Body).Decode(&res)
+	require.NoError(t, err)
+	assert.Nil(t, res.Error)
+	assert.Equal(t, "hello", res.Result)
+
+	rec = httptest.NewRecorder()
+	r, err = http.NewRequest("", "", bytes.NewReader([]byte(`{"jsonrpc":"2.0","id":"test","method":"hello","params":{}}`)))
+	require.NoError(t, err)
+	r.Header.Set("Content-Type", "application/json")
+
+	Filter = func(c context.Context, r *Request) *Error {
+		return ErrInternal()
+	}
+
+	Handler(c, rec, r)
+	res = Response{}
+	err = json.NewDecoder(rec.Body).Decode(&res)
+	require.NoError(t, err)
+	assert.Equal(t, ErrInternal().Error(), res.Error.Error())
 }

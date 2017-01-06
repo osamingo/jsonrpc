@@ -8,6 +8,9 @@ import (
 	"golang.org/x/net/context"
 )
 
+// Filter runs before invoke a method.
+var Filter func(context.Context, *Request) *Error
+
 // Handler provides basic JSON-RPC handling.
 func Handler(c context.Context, w http.ResponseWriter, r *http.Request) {
 
@@ -30,6 +33,14 @@ func Handler(c context.Context, w http.ResponseWriter, r *http.Request) {
 		if res.Error != nil {
 			resp[i] = res
 			continue
+		}
+
+		if Filter != nil {
+			res.Error = Filter(c, &rs[i])
+			if res.Error != nil {
+				resp[i] = res
+				continue
+			}
 		}
 
 		res.Result, res.Error = f(c, rs[i].Params)
