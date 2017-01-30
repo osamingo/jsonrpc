@@ -64,8 +64,11 @@ func TestHandler(t *testing.T) {
 	require.NoError(t, err)
 	r.Header.Set("Content-Type", "application/json")
 
-	Filter = func(c context.Context, r *Request) *Error {
+	Before = func(c context.Context, r *Request) *Error {
 		return nil
+	}
+	After = func(c context.Context, res *Response) {
+		// do nothing
 	}
 
 	Handler(c, rec, r)
@@ -80,7 +83,7 @@ func TestHandler(t *testing.T) {
 	require.NoError(t, err)
 	r.Header.Set("Content-Type", "application/json")
 
-	Filter = func(c context.Context, r *Request) *Error {
+	Before = func(c context.Context, r *Request) *Error {
 		return ErrInternal()
 	}
 
