@@ -40,7 +40,7 @@ func Handler(c context.Context, w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func invokeMethod(c context.Context, r Request) (Response) {
+func invokeMethod(c context.Context, r Request) Response {
 	res := NewResponse(r)
 	if After !=nil {
 		defer After(c, &res)
