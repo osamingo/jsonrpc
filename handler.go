@@ -8,8 +8,13 @@ import (
 	"golang.org/x/net/context"
 )
 
-// Filter runs before invoke a method.
-var Filter func(context.Context, *Request) *Error
+var (
+	// Before runs before invoke a method.
+	Before func(context.Context, *Request) *Error
+	// After runs after invoke a method.
+	After func(context.Context, *Response)
+)
+
 
 // Handler provides basic JSON-RPC handling.
 func Handler(c context.Context, w http.ResponseWriter, r *http.Request) {
@@ -27,27 +32,30 @@ func Handler(c context.Context, w http.ResponseWriter, r *http.Request) {
 
 	resp := make([]Response, len(rs))
 	for i := range rs {
-		var f Func
-		res := NewResponse(rs[i])
-		f, res.Error = TakeMethod(rs[i])
-		if res.Error != nil {
-			resp[i] = res
-			continue
-		}
-
-		if Filter != nil {
-			res.Error = Filter(c, &rs[i])
-			if res.Error != nil {
-				resp[i] = res
-				continue
-			}
-		}
-
-		res.Result, res.Error = f(c, rs[i].Params)
-		resp[i] = res
+		resp[i] = invokeMethod(c, rs[i])
 	}
 
 	if err := SendResponse(w, resp, batch); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 	}
+}
+
+func invokeMethod(c context.Context, r Request) (Response) {
+	res := NewResponse(r)
+	if After !=nil {
+		defer After(c, &res)
+	}
+	if Before != nil {
+		res.Error = Before(c, &r)
+		if res.Error != nil {
+			return res
+		}
+	}
+	var f Func
+	f, res.Error = TakeMethod(r)
+	if res.Error != nil {
+		return res
+	}
+	res.Result, res.Error = f(c, r.Params)
+	return res
 }
