@@ -15,7 +15,6 @@ var (
 	After func(context.Context, *Response)
 )
 
-
 // Handler provides basic JSON-RPC handling.
 func Handler(c context.Context, w http.ResponseWriter, r *http.Request) {
 
@@ -42,7 +41,7 @@ func Handler(c context.Context, w http.ResponseWriter, r *http.Request) {
 
 func invokeMethod(c context.Context, r Request) Response {
 	res := NewResponse(r)
-	if After !=nil {
+	if After != nil {
 		defer After(c, &res)
 	}
 	if Before != nil {

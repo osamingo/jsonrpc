@@ -41,7 +41,7 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 
 func invokeMethod(c context.Context, r Request) Response {
 	res := NewResponse(r)
-	if After !=nil {
+	if After != nil {
 		defer After(c, &res)
 	}
 	if Before != nil {
