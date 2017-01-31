@@ -11,7 +11,7 @@ var (
 	// Before runs before invoke a method.
 	Before func(context.Context, *Request) *Error
 	// After runs after invoke a method.
-	After func(context.Context, *Response)
+	After func(context.Context, *Response, *Request)
 )
 
 // Handler provides basic JSON-RPC handling.

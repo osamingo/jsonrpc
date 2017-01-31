@@ -66,7 +66,7 @@ func TestHandler17(t *testing.T) {
 	Before = func(c context.Context, r *Request) *Error {
 		return nil
 	}
-	After = func(c context.Context, res *Response) {
+	After = func(c context.Context, res *Response, r *Request) {
 		// do nothing
 	}
 
