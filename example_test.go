@@ -1,17 +1,16 @@
-// +build !go1.7
+// +build go1.7
 
 package jsonrpc
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"io"
 	"log"
 	"net/http"
 	"net/http/httptest"
 	"os"
-
-	"golang.org/x/net/context"
 )
 
 type (
@@ -44,13 +43,13 @@ func ExampleJSONRPC() {
 		log.Fatalln(err)
 	}
 
-	http.HandleFunc("/jrpc", HandlerFunc)
-	http.HandleFunc("/jrpc/debug", DebugHandlerFunc)
+	http.HandleFunc("/v17/jrpc", HandlerFunc)
+	http.HandleFunc("/v17/jrpc/debug", DebugHandlerFunc)
 
 	srv := httptest.NewServer(http.DefaultServeMux)
 	defer srv.Close()
 
-	resp, err := http.Post(srv.URL+"/jrpc", "application/json", bytes.NewBufferString(`{
+	resp, err := http.Post(srv.URL+"/v17/jrpc", "application/json", bytes.NewBufferString(`{
 	  "jsonrpc": "2.0",
       "method": "Main.Echo",
       "params": {
