@@ -37,6 +37,7 @@ import (
 )
 
 type (
+	EchoHandler struct {}
 	EchoParams struct {
 		Name string `json:"name"`
 	}
@@ -45,7 +46,9 @@ type (
 	}
 )
 
-func Echo(c context.Context, params *json.RawMessage) (interface{}, *jsonrpc.Error) {
+var _ (jsonrpc.Handler) = (*EchoHandler)(nil)
+
+func (h *EchoHandler)ServeJSONRPC(c context.Context, params *json.RawMessage) (interface{}, *jsonrpc.Error) {
 
 	var p EchoParams
 	if err := jsonrpc.Unmarshal(params, &p); err != nil {
@@ -58,12 +61,12 @@ func Echo(c context.Context, params *json.RawMessage) (interface{}, *jsonrpc.Err
 }
 
 func init() {
-	jsonrpc.RegisterMethod("Echo", Echo, EchoParams{}, EchoResult{})
+	jsonrpc.RegisterMethod("Main.Echo", &EchoHandler{}, EchoParams{}, EchoResult{})
 }
 
 func main() {
-	http.HandleFunc("/v1/jrpc", jsonrpc.Handler)
-	http.HandleFunc("/v1/jrpc/debug", jsonrpc.DebugHandler)
+	http.HandleFunc("/jrpc", jsonrpc.HandlerFunc)
+	http.HandleFunc("/jrpc/debug", jsonrpc.DebugHandler)
 	if err := http.ListenAndServe(":8080", nil); err != nil {
 		log.Fatalln(err)
 	}
@@ -75,7 +78,7 @@ func main() {
 #### Invoke the Echo method
 
 ```
-POST /v1/jrpc HTTP/1.1
+POST /jrpc HTTP/1.1
 Accept: application/json, */*
 Accept-Encoding: gzip, deflate
 Connection: keep-alive
@@ -86,7 +89,7 @@ User-Agent: HTTPie/0.9.6
 
 {
   "jsonrpc": "2.0",
-  "method": "Echo",
+  "method": "Main.Echo",
   "params": {
     "name": "John Doe"
   },
@@ -110,7 +113,7 @@ Date: Mon, 28 Nov 2016 13:48:13 GMT
 #### Access to debug handler
 
 ```
-GET /v1/jrpc/debug HTTP/1.1
+GET /jrpc/debug HTTP/1.1
 Accept: */*
 Accept-Encoding: gzip, deflate
 Connection: keep-alive
@@ -126,39 +129,41 @@ Date: Mon, 28 Nov 2016 13:56:24 GMT
 
 [
   {
-    "name": "Echo",
-    "function": "main.Echo",
+    "handler": "EchoHandler",
+    "name": "Main.Echo",
     "params": {
       "$ref": "#/definitions/EchoParams",
+      "$schema": "http://json-schema.org/draft-04/schema#",
       "definitions": {
         "EchoParams": {
-          "type": "object",
+          "additionalProperties": false,
           "properties": {
             "name": {
               "type": "string"
             }
           },
-          "additionalProperties": false,
           "required": [
             "name"
-          ]
+          ],
+          "type": "object"
         }
       }
     },
     "result": {
       "$ref": "#/definitions/EchoResult",
+      "$schema": "http://json-schema.org/draft-04/schema#",
       "definitions": {
         "EchoResult": {
-          "type": "object",
+          "additionalProperties": false,
           "properties": {
             "message": {
               "type": "string"
             }
           },
-          "additionalProperties": false,
           "required": [
             "message"
-          ]
+          ],
+          "type": "object"
         }
       }
     }

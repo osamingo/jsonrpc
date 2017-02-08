@@ -3,19 +3,17 @@ package jsonrpc
 import (
 	"encoding/json"
 	"net/http"
-	"path"
 	"reflect"
-	"runtime"
 
 	"github.com/alecthomas/jsonschema"
 )
 
 // A MethodReference is a reference of JSON-RPC method.
 type MethodReference struct {
-	Name     string             `json:"name"`
-	Function string             `json:"function"`
-	Params   *jsonschema.Schema `json:"params,omitempty"`
-	Result   *jsonschema.Schema `json:"result,omitempty"`
+	Name    string             `json:"name"`
+	Handler string             `json:"handler"`
+	Params  *jsonschema.Schema `json:"params,omitempty"`
+	Result  *jsonschema.Schema `json:"result,omitempty"`
 }
 
 // DebugHandler views registered method list.
@@ -28,9 +26,13 @@ func DebugHandler(w http.ResponseWriter, r *http.Request) {
 	l := make([]MethodReference, 0, len(ms))
 	for k, md := range ms {
 		mr := MethodReference{
-			Name:     k,
-			Function: path.Base(runtime.FuncForPC(reflect.ValueOf(md.Func).Pointer()).Name()),
+			Name: k,
 		}
+		tv := reflect.TypeOf(md.Handler)
+		if tv.Kind() == reflect.Ptr {
+			tv = tv.Elem()
+		}
+		mr.Handler = tv.Name()
 		if md.Params != nil {
 			mr.Params = jsonschema.Reflect(md.Params)
 		}
@@ -39,9 +41,9 @@ func DebugHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		l = append(l, mr)
 	}
+	w.Header().Set(contentTypeKey, contentTypeValue)
 	if err := json.NewEncoder(w).Encode(l); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	w.Header().Set(contentTypeKey, contentTypeValue)
 }

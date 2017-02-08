@@ -1,9 +1,10 @@
-// +build !go1.7
+// +build go1.7
 
 package jsonrpc
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
@@ -11,19 +12,25 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"golang.org/x/net/context"
 )
 
-func TestHandler(t *testing.T) {
+type handler struct {
+	F func(c context.Context, params *json.RawMessage) (interface{}, *Error)
+}
+
+func (h handler) ServeJSONRPC(c context.Context, params *json.RawMessage) (interface{}, *Error) {
+	return h.F(c, params)
+}
+
+func TestHandler17(t *testing.T) {
 
 	PurgeMethods()
 
-	c := context.Background()
 	rec := httptest.NewRecorder()
 	r, err := http.NewRequest("", "", nil)
 	require.NoError(t, err)
 
-	Handler(c, rec, r)
+	HandlerFunc(rec, r)
 
 	res := Response{}
 	err = json.NewDecoder(rec.Body).Decode(&res)
@@ -35,22 +42,24 @@ func TestHandler(t *testing.T) {
 	require.NoError(t, err)
 	r.Header.Set("Content-Type", "application/json")
 
-	Handler(c, rec, r)
+	HandlerFunc(rec, r)
 	res = Response{}
 	err = json.NewDecoder(rec.Body).Decode(&res)
 	require.NoError(t, err)
 	assert.NotNil(t, res.Error)
 
-	require.NoError(t, RegisterMethod("hello", func(c context.Context, params *json.RawMessage) (interface{}, *Error) {
+	h := handler{}
+	h.F = func(c context.Context, params *json.RawMessage) (interface{}, *Error) {
 		return "hello", nil
-	}, nil, nil))
+	}
+	require.NoError(t, RegisterMethod("hello", h, nil, nil))
 
 	rec = httptest.NewRecorder()
 	r, err = http.NewRequest("", "", bytes.NewReader([]byte(`{"jsonrpc":"2.0","id":"test","method":"hello","params":{}}`)))
 	require.NoError(t, err)
 	r.Header.Set("Content-Type", "application/json")
 
-	Handler(c, rec, r)
+	HandlerFunc(rec, r)
 	res = Response{}
 	err = json.NewDecoder(rec.Body).Decode(&res)
 	require.NoError(t, err)
@@ -71,7 +80,7 @@ func TestHandler(t *testing.T) {
 		// do nothing
 	}
 
-	Handler(c, rec, r)
+	HandlerFunc(rec, r)
 	res = Response{}
 	err = json.NewDecoder(rec.Body).Decode(&res)
 	require.NoError(t, err)
@@ -87,7 +96,7 @@ func TestHandler(t *testing.T) {
 		return ErrInternal()
 	}
 
-	Handler(c, rec, r)
+	HandlerFunc(rec, r)
 	res = Response{}
 	err = json.NewDecoder(rec.Body).Decode(&res)
 	require.NoError(t, err)

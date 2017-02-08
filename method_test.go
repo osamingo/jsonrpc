@@ -28,9 +28,7 @@ func TestTakeMethod(t *testing.T) {
 	require.IsType(t, &Error{}, err)
 	assert.Equal(t, ErrorCodeMethodNotFound, err.Code)
 
-	require.NoError(t, RegisterMethod("test", func(c context.Context, params *json.RawMessage) (result interface{}, err *Error) {
-		return nil, nil
-	}, nil, nil))
+	require.NoError(t, RegisterMethod("test", SampleHandler(), nil, nil))
 
 	f, err := TakeMethod(r)
 	require.Nil(t, err)
@@ -45,20 +43,24 @@ func TestRegisterMethod(t *testing.T) {
 	err = RegisterMethod("test", nil, nil, nil)
 	require.Error(t, err)
 
-	err = RegisterMethod("test", SampleFunc, nil, nil)
+	err = RegisterMethod("test", SampleHandler(), nil, nil)
 	require.NoError(t, err)
 }
 
 func TestMethods(t *testing.T) {
 
-	err := RegisterMethod("JsonRpc.Sample", SampleFunc, nil, nil)
+	err := RegisterMethod("JsonRpc.Sample", SampleHandler(), nil, nil)
 	require.NoError(t, err)
 
 	ml := Methods()
 	require.NotEmpty(t, ml)
-	assert.NotEmpty(t, ml["JsonRpc.Sample"].Func)
+	assert.NotEmpty(t, ml["JsonRpc.Sample"].Handler)
 }
 
-func SampleFunc(c context.Context, params *json.RawMessage) (result interface{}, err *Error) {
-	return nil, nil
+func SampleHandler() Handler {
+	h := handler{}
+	h.F = func(c context.Context, params *json.RawMessage) (result interface{}, err *Error) {
+		return nil, nil
+	}
+	return h
 }

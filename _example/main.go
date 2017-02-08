@@ -10,7 +10,8 @@ import (
 )
 
 type (
-	EchoParams struct {
+	EchoHandler struct{}
+	EchoParams  struct {
 		Name string `json:"name"`
 	}
 	EchoResult struct {
@@ -18,7 +19,9 @@ type (
 	}
 )
 
-func Echo(c context.Context, params *json.RawMessage) (interface{}, *jsonrpc.Error) {
+var _ (jsonrpc.Handler) = (*EchoHandler)(nil)
+
+func (h *EchoHandler) ServeJSONRPC(c context.Context, params *json.RawMessage) (interface{}, *jsonrpc.Error) {
 
 	var p EchoParams
 	if err := jsonrpc.Unmarshal(params, &p); err != nil {
@@ -31,12 +34,12 @@ func Echo(c context.Context, params *json.RawMessage) (interface{}, *jsonrpc.Err
 }
 
 func init() {
-	jsonrpc.RegisterMethod("Echo", Echo, EchoParams{}, EchoResult{})
+	jsonrpc.RegisterMethod("Main.Echo", &EchoHandler{}, EchoParams{}, EchoResult{})
 }
 
 func main() {
-	http.HandleFunc("/v1/jrpc", jsonrpc.Handler)
-	http.HandleFunc("/v1/jrpc/debug", jsonrpc.DebugHandler)
+	http.HandleFunc("/jrpc", jsonrpc.HandlerFunc)
+	http.HandleFunc("/jrpc/debug", jsonrpc.DebugHandler)
 	if err := http.ListenAndServe(":8080", nil); err != nil {
 		log.Fatalln(err)
 	}

@@ -23,7 +23,7 @@ func TestDebugHandler(t *testing.T) {
 
 	require.Equal(t, http.StatusNotFound, rec.Code)
 
-	require.NoError(t, RegisterMethod("Debug.Sample", SampleFunc, struct {
+	require.NoError(t, RegisterMethod("Debug.Sample", SampleHandler(), struct {
 		Name string `json:"name"`
 	}{}, struct {
 		Message string `json:"message,omitrmpty"`

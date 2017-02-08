@@ -3,58 +3,12 @@
 package jsonrpc
 
 import (
-	"net/http"
+	"encoding/json"
 
 	"golang.org/x/net/context"
 )
 
-var (
-	// Before runs before invoke a method.
-	Before func(context.Context, *Request) *Error
-	// After runs after invoke a method.
-	After func(context.Context, *Response, *Request)
-)
-
-// Handler provides basic JSON-RPC handling.
-func Handler(c context.Context, w http.ResponseWriter, r *http.Request) {
-
-	rs, batch, err := ParseRequest(r)
-	if err != nil {
-		SendResponse(w, []Response{
-			{
-				Version: Version,
-				Error:   err,
-			},
-		}, false)
-		return
-	}
-
-	resp := make([]Response, len(rs))
-	for i := range rs {
-		resp[i] = invokeMethod(c, rs[i])
-	}
-
-	if err := SendResponse(w, resp, batch); err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-	}
-}
-
-func invokeMethod(c context.Context, r Request) Response {
-	res := NewResponse(r)
-	if After != nil {
-		defer After(c, &res, &r)
-	}
-	if Before != nil {
-		res.Error = Before(c, &r)
-		if res.Error != nil {
-			return res
-		}
-	}
-	var f Func
-	f, res.Error = TakeMethod(r)
-	if res.Error != nil {
-		return res
-	}
-	res.Result, res.Error = f(c, r.Params)
-	return res
+// Handler links a method of JSON-RPC request.
+type Handler interface {
+	ServeJSONRPC(c context.Context, params *json.RawMessage) (result interface{}, err *Error)
 }
