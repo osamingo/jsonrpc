@@ -66,7 +66,7 @@ func TestParseRequest(t *testing.T) {
 
 func TestNewResponse(t *testing.T) {
 	id := json.RawMessage("test")
-	r := NewResponse(Request{
+	r := MakeResponse(Request{
 		Version: "2.0",
 		ID:      &id,
 	})

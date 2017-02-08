@@ -74,8 +74,8 @@ func ParseRequest(r *http.Request) ([]Request, bool, *Error) {
 	return rs, true, nil
 }
 
-// NewResponse generates a JSON-RPC response.
-func NewResponse(r Request) Response {
+// MakeResponse generates a JSON-RPC response.
+func MakeResponse(r Request) Response {
 	return Response{
 		Version: r.Version,
 		ID:      r.ID,
