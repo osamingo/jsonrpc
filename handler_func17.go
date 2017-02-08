@@ -7,13 +7,6 @@ import (
 	"net/http"
 )
 
-var (
-	// Before runs before invoke a method.
-	Before func(context.Context, *Request) *Error
-	// After runs after invoke a method.
-	After func(context.Context, *Response, *Request)
-)
-
 // HandlerFunc provides basic JSON-RPC handling.
 func HandlerFunc(w http.ResponseWriter, r *http.Request) {
 
@@ -40,17 +33,8 @@ func HandlerFunc(w http.ResponseWriter, r *http.Request) {
 }
 
 func invokeMethod(c context.Context, r Request) Response {
-	res := MakeResponse(r)
-	if After != nil {
-		defer After(c, &res, &r)
-	}
-	if Before != nil {
-		res.Error = Before(c, &r)
-		if res.Error != nil {
-			return res
-		}
-	}
 	var h Handler
+	res := MakeResponse(r)
 	h, res.Error = TakeMethod(r)
 	if res.Error != nil {
 		return res
