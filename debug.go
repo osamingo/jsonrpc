@@ -20,10 +20,9 @@ type MethodReference struct {
 
 // DebugHandler views registered method list.
 func DebugHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set(contentTypeKey, contentTypeValue)
 	ms := Methods()
 	if len(ms) == 0 {
-		w.Write([]byte("[]"))
+		w.WriteHeader(http.StatusNotFound)
 		return
 	}
 	l := make([]MethodReference, 0, len(ms))
@@ -40,10 +39,9 @@ func DebugHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		l = append(l, mr)
 	}
-	b, err := json.Marshal(l)
-	if err != nil {
+	if err := json.NewEncoder(w).Encode(l); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	w.Write(b)
+	w.Header().Set(contentTypeKey, contentTypeValue)
 }

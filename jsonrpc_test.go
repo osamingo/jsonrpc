@@ -48,7 +48,7 @@ func TestParseRequest(t *testing.T) {
 	r.Header.Set("Content-Type", "application/json")
 	_, _, err = ParseRequest(r)
 	require.IsType(t, &Error{}, err)
-	assert.Equal(t, ErrorCodeInvalidRequest, err.Code)
+	assert.Equal(t, ErrorCodeParse, err.Code)
 
 	r, _ = http.NewRequest("", "", bytes.NewReader([]byte("[test]")))
 	r.Header.Set("Content-Type", "application/json")
@@ -95,15 +95,18 @@ func TestSendResponse(t *testing.T) {
 	rec = httptest.NewRecorder()
 	err = SendResponse(rec, []Response{r}, false)
 	require.NoError(t, err)
-	assert.Equal(t, `{"id":"test","jsonrpc":"2.0","result":{"name":"john"}}`, rec.Body.String())
+	assert.Equal(t, `{"id":"test","jsonrpc":"2.0","result":{"name":"john"}}
+`, rec.Body.String())
 
 	rec = httptest.NewRecorder()
 	err = SendResponse(rec, []Response{r}, true)
 	require.NoError(t, err)
-	assert.Equal(t, `[{"id":"test","jsonrpc":"2.0","result":{"name":"john"}}]`, rec.Body.String())
+	assert.Equal(t, `[{"id":"test","jsonrpc":"2.0","result":{"name":"john"}}]
+`, rec.Body.String())
 
 	rec = httptest.NewRecorder()
 	err = SendResponse(rec, []Response{r, r}, false)
 	require.NoError(t, err)
-	assert.Equal(t, `[{"id":"test","jsonrpc":"2.0","result":{"name":"john"}},{"id":"test","jsonrpc":"2.0","result":{"name":"john"}}]`, rec.Body.String())
+	assert.Equal(t, `[{"id":"test","jsonrpc":"2.0","result":{"name":"john"}},{"id":"test","jsonrpc":"2.0","result":{"name":"john"}}]
+`, rec.Body.String())
 }

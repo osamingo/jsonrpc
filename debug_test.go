@@ -21,8 +21,7 @@ func TestDebugHandler(t *testing.T) {
 
 	DebugHandler(rec, r)
 
-	require.Equal(t, http.StatusOK, rec.Code)
-	assert.Equal(t, "[]", rec.Body.String())
+	require.Equal(t, http.StatusNotFound, rec.Code)
 
 	require.NoError(t, RegisterMethod("Debug.Sample", SampleFunc, struct {
 		Name string `json:"name"`

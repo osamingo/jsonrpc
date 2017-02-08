@@ -10,10 +10,9 @@ const (
 	// Version is JSON-RPC 2.0.
 	Version = "2.0"
 
-	batchRequestPrefixKey = '['
-	batchRequestSuffixKey = ']'
-	contentTypeKey        = "Content-Type"
-	contentTypeValue      = "application/json"
+	batchRequestKey  = '['
+	contentTypeKey   = "Content-Type"
+	contentTypeValue = "application/json"
 )
 
 type (
@@ -45,28 +44,30 @@ func ParseRequest(r *http.Request) ([]Request, bool, *Error) {
 	if _, err := buf.ReadFrom(r.Body); err != nil {
 		return nil, false, ErrInvalidRequest()
 	}
-	r.Body.Close()
+	defer r.Body.Close()
 
 	if buf.Len() == 0 {
 		return nil, false, ErrInvalidRequest()
 	}
 
-	body := buf.Bytes()
-	buf.Reset()
-	if body[0] != batchRequestPrefixKey {
-		var req Request
-		if err := json.Unmarshal(body, &req); err != nil {
-			return nil, false, ErrParse()
-		}
-		return []Request{req}, false, nil
+	f, _, err := buf.ReadRune()
+	if err != nil {
+		return nil, false, ErrInvalidRequest()
 	}
-
-	if body[len(body)-1] != batchRequestSuffixKey {
+	if err := buf.UnreadRune(); err != nil {
 		return nil, false, ErrInvalidRequest()
 	}
 
 	var rs []Request
-	if err := json.Unmarshal(body, &rs); err != nil {
+	if f != batchRequestKey {
+		var req Request
+		if err := json.NewDecoder(buf).Decode(&req); err != nil {
+			return nil, false, ErrParse()
+		}
+		return append(rs, req), false, nil
+	}
+
+	if err := json.NewDecoder(buf).Decode(&rs); err != nil {
 		return nil, false, ErrParse()
 	}
 
@@ -75,37 +76,19 @@ func ParseRequest(r *http.Request) ([]Request, bool, *Error) {
 
 // NewResponse generates a JSON-RPC response.
 func NewResponse(r Request) Response {
-	res := Response{
+	return Response{
 		Version: r.Version,
+		ID:      r.ID,
 	}
-	if r.ID != nil {
-		res.ID = r.ID
-	}
-	return res
 }
 
 // SendResponse writes JSON-RPC response.
 func SendResponse(w http.ResponseWriter, resp []Response, batch bool) error {
-
 	w.Header().Set(contentTypeKey, contentTypeValue)
-
-	if len(resp) == 0 {
-		return nil
+	if batch || len(resp) > 1 {
+		return json.NewEncoder(w).Encode(resp)
+	} else if len(resp) == 1 {
+		return json.NewEncoder(w).Encode(resp[0])
 	}
-
-	var bin []byte
-	var err error
-	if !batch && len(resp) == 1 {
-		bin, err = json.Marshal(&resp[0])
-	} else {
-		bin, err = json.Marshal(&resp)
-	}
-
-	if err != nil {
-		return err
-	}
-
-	_, err = w.Write(bin)
-
-	return err
+	return nil
 }
