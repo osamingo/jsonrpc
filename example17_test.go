@@ -1,17 +1,16 @@
-// +build !go1.7
+// +build go1.7
 
 package jsonrpc
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"io"
 	"log"
 	"net/http"
 	"net/http/httptest"
 	"os"
-
-	"golang.org/x/net/context"
 )
 
 type (
