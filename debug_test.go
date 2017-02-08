@@ -19,7 +19,7 @@ func TestDebugHandler(t *testing.T) {
 	r, err := http.NewRequest("", "", nil)
 	require.NoError(t, err)
 
-	DebugHandler(rec, r)
+	DebugHandlerFunc(rec, r)
 
 	require.Equal(t, http.StatusNotFound, rec.Code)
 
@@ -33,7 +33,7 @@ func TestDebugHandler(t *testing.T) {
 	r, err = http.NewRequest("", "", nil)
 	require.NoError(t, err)
 
-	DebugHandler(rec, r)
+	DebugHandlerFunc(rec, r)
 
 	require.Equal(t, http.StatusOK, rec.Code)
 	assert.NotEmpty(t, rec.Body.String())
