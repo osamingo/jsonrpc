@@ -1,13 +1,13 @@
 package jsonrpc
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
-	"net/http"
-	"log"
-	"net/http/httptest"
-	"bytes"
 	"io"
+	"log"
+	"net/http"
+	"net/http/httptest"
 	"os"
 )
 
