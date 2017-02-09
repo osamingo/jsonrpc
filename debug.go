@@ -23,9 +23,9 @@ func DebugHandlerFunc(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
-	l := make([]MethodReference, 0, len(ms))
+	l := make([]*MethodReference, 0, len(ms))
 	for k, md := range ms {
-		mr := MethodReference{
+		mr := &MethodReference{
 			Name: k,
 		}
 		tv := reflect.TypeOf(md.Handler)

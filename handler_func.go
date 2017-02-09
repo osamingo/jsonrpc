@@ -13,7 +13,7 @@ func HandlerFunc(c context.Context, w http.ResponseWriter, r *http.Request) {
 
 	rs, batch, err := ParseRequest(r)
 	if err != nil {
-		SendResponse(w, []Response{
+		SendResponse(w, []*Response{
 			{
 				Version: Version,
 				Error:   err,
@@ -22,7 +22,7 @@ func HandlerFunc(c context.Context, w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	resp := make([]Response, len(rs))
+	resp := make([]*Response, len(rs))
 	for i := range rs {
 		resp[i] = invokeMethod(c, rs[i])
 	}
@@ -32,9 +32,9 @@ func HandlerFunc(c context.Context, w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func invokeMethod(c context.Context, r Request) Response {
+func invokeMethod(c context.Context, r *Request) *Response {
 	var h Handler
-	res := MakeResponse(r)
+	res := NewResponse(r)
 	h, res.Error = TakeMethod(r)
 	if res.Error != nil {
 		return res

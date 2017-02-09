@@ -34,7 +34,7 @@ type (
 )
 
 // ParseRequest parses a HTTP request to JSON-RPC request.
-func ParseRequest(r *http.Request) ([]Request, bool, *Error) {
+func ParseRequest(r *http.Request) ([]*Request, bool, *Error) {
 
 	if r.Header.Get(contentTypeKey) != contentTypeValue {
 		return nil, false, ErrInvalidRequest()
@@ -58,9 +58,9 @@ func ParseRequest(r *http.Request) ([]Request, bool, *Error) {
 		return nil, false, ErrInvalidRequest()
 	}
 
-	var rs []Request
+	var rs []*Request
 	if f != batchRequestKey {
-		var req Request
+		var req *Request
 		if err := json.NewDecoder(buf).Decode(&req); err != nil {
 			return nil, false, ErrParse()
 		}
@@ -74,16 +74,16 @@ func ParseRequest(r *http.Request) ([]Request, bool, *Error) {
 	return rs, true, nil
 }
 
-// MakeResponse generates a JSON-RPC response.
-func MakeResponse(r Request) Response {
-	return Response{
+// NewResponse generates a JSON-RPC response.
+func NewResponse(r *Request) *Response {
+	return &Response{
 		Version: r.Version,
 		ID:      r.ID,
 	}
 }
 
 // SendResponse writes JSON-RPC response.
-func SendResponse(w http.ResponseWriter, resp []Response, batch bool) error {
+func SendResponse(w http.ResponseWriter, resp []*Response, batch bool) error {
 	w.Header().Set(contentTypeKey, contentTypeValue)
 	if batch || len(resp) > 1 {
 		return json.NewEncoder(w).Encode(resp)

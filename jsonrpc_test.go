@@ -66,7 +66,7 @@ func TestParseRequest(t *testing.T) {
 
 func TestNewResponse(t *testing.T) {
 	id := json.RawMessage("test")
-	r := MakeResponse(Request{
+	r := NewResponse(&Request{
 		Version: "2.0",
 		ID:      &id,
 	})
@@ -77,12 +77,12 @@ func TestNewResponse(t *testing.T) {
 func TestSendResponse(t *testing.T) {
 
 	rec := httptest.NewRecorder()
-	err := SendResponse(rec, []Response{}, false)
+	err := SendResponse(rec, []*Response{}, false)
 	require.NoError(t, err)
 	assert.Empty(t, rec.Body.String())
 
 	id := json.RawMessage([]byte(`"test"`))
-	r := Response{
+	r := &Response{
 		ID:      &id,
 		Version: "2.0",
 		Result: struct {
@@ -93,19 +93,19 @@ func TestSendResponse(t *testing.T) {
 	}
 
 	rec = httptest.NewRecorder()
-	err = SendResponse(rec, []Response{r}, false)
+	err = SendResponse(rec, []*Response{r}, false)
 	require.NoError(t, err)
 	assert.Equal(t, `{"id":"test","jsonrpc":"2.0","result":{"name":"john"}}
 `, rec.Body.String())
 
 	rec = httptest.NewRecorder()
-	err = SendResponse(rec, []Response{r}, true)
+	err = SendResponse(rec, []*Response{r}, true)
 	require.NoError(t, err)
 	assert.Equal(t, `[{"id":"test","jsonrpc":"2.0","result":{"name":"john"}}]
 `, rec.Body.String())
 
 	rec = httptest.NewRecorder()
-	err = SendResponse(rec, []Response{r, r}, false)
+	err = SendResponse(rec, []*Response{r, r}, false)
 	require.NoError(t, err)
 	assert.Equal(t, `[{"id":"test","jsonrpc":"2.0","result":{"name":"john"}},{"id":"test","jsonrpc":"2.0","result":{"name":"john"}}]
 `, rec.Body.String())

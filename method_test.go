@@ -13,7 +13,7 @@ import (
 
 func TestTakeMethod(t *testing.T) {
 
-	r := Request{}
+	r := &Request{}
 	_, err := TakeMethod(r)
 	require.IsType(t, &Error{}, err)
 	assert.Equal(t, ErrorCodeInvalidParams, err.Code)

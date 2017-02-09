@@ -25,7 +25,7 @@ var mr = MethodRepository{
 }
 
 // TakeMethod takes jsonrpc.Func in MethodRepository.
-func TakeMethod(r Request) (Handler, *Error) {
+func TakeMethod(r *Request) (Handler, *Error) {
 	if r.Method == "" || r.Version != Version {
 		return nil, ErrInvalidParams()
 	}
