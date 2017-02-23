@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"net/http"
+	"strings"
 )
 
 const (
@@ -36,7 +37,7 @@ type (
 // ParseRequest parses a HTTP request to JSON-RPC request.
 func ParseRequest(r *http.Request) ([]*Request, bool, *Error) {
 
-	if r.Header.Get(contentTypeKey) != contentTypeValue {
+	if !strings.HasPrefix(r.Header.Get(contentTypeKey), contentTypeValue) {
 		return nil, false, ErrInvalidRequest()
 	}
 
