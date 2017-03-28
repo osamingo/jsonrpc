@@ -8,7 +8,7 @@ import (
 	"golang.org/x/net/context"
 )
 
-type requestIDKey struct {}
+type requestIDKey struct{}
 
 // RequestID takes request id from context.
 func RequestID(c context.Context) *json.RawMessage {

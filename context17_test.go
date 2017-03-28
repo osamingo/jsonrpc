@@ -16,7 +16,7 @@ func TestRequestID(t *testing.T) {
 	id := json.RawMessage("1")
 	c = WithRequestID(c, &id)
 	var pick *json.RawMessage
-	require.NotPanics(t, func(){
+	require.NotPanics(t, func() {
 		pick = RequestID(c)
 	})
 	require.Equal(t, &id, pick)

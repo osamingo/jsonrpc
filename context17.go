@@ -7,7 +7,7 @@ import (
 	"encoding/json"
 )
 
-type requestIDKey struct {}
+type requestIDKey struct{}
 
 // RequestID takes request id from context.
 func RequestID(c context.Context) *json.RawMessage {
