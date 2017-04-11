@@ -40,5 +40,8 @@ func invokeMethod(c context.Context, r *Request) *Response {
 		return res
 	}
 	res.Result, res.Error = h.ServeJSONRPC(WithRequestID(c, r.ID), r.Params)
+	if res.Error != nil {
+		res.Result = nil
+	}
 	return res
 }
