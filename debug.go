@@ -28,11 +28,7 @@ func DebugHandlerFunc(w http.ResponseWriter, r *http.Request) {
 		mr := &MethodReference{
 			Name: k,
 		}
-		tv := reflect.TypeOf(md.Handler)
-		if tv.Kind() == reflect.Ptr {
-			tv = tv.Elem()
-		}
-		mr.Handler = tv.Name()
+		mr.Handler = reflect.TypeOf(md.Handler).Name()
 		if md.Params != nil {
 			mr.Params = jsonschema.Reflect(md.Params)
 		}
