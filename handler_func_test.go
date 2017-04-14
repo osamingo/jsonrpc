@@ -1,5 +1,3 @@
-// +build !go1.7
-
 package jsonrpc
 
 import (
@@ -66,4 +64,20 @@ func TestHandler(t *testing.T) {
 	require.NoError(t, err)
 	assert.Nil(t, res.Error)
 	assert.Equal(t, "hello", res.Result)
+
+	h.F = func(c context.Context, params *json.RawMessage) (interface{}, *Error) {
+		return nil, ErrInternal()
+	}
+	require.NoError(t, RegisterMethod("hello", h, nil, nil))
+
+	rec = httptest.NewRecorder()
+	r, err = http.NewRequest("", "", bytes.NewReader([]byte(`{"jsonrpc":"2.0","id":"test","method":"hello","params":{}}`)))
+	require.NoError(t, err)
+	r.Header.Set("Content-Type", "application/json")
+
+	HandlerFunc(c, rec, r)
+	res = Response{}
+	err = json.NewDecoder(rec.Body).Decode(&res)
+	require.NoError(t, err)
+	assert.NotNil(t, res.Error)
 }
