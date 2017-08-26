@@ -7,6 +7,12 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func TestError(t *testing.T) {
+	var err interface{} = &Error{}
+	_, ok := err.(error)
+	require.True(t, ok)
+}
+
 func TestError_Error(t *testing.T) {
 
 	err := &Error{

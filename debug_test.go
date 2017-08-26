@@ -1,5 +1,3 @@
-// +build go1.7
-
 package jsonrpc
 
 import (
@@ -26,7 +24,7 @@ func TestDebugHandler(t *testing.T) {
 	require.NoError(t, RegisterMethod("Debug.Sample", SampleHandler(), struct {
 		Name string `json:"name"`
 	}{}, struct {
-		Message string `json:"message,omitrmpty"`
+		Message string `json:"message,omitempty"`
 	}{}))
 
 	rec = httptest.NewRecorder()
