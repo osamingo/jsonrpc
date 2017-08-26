@@ -1,22 +1,29 @@
-sudo: required
-dist: trusty
+sudo: false
 
 language: go
 go:
-  - 1.6
-  - 1.7
-  - 1.8
+  - 1.6.4
+  - 1.7.6
+  - 1.8.3
+  - 1.9
+  - tip
+
+matrix:
+  allow_failures:
+  - go: tip
 
 before_install:
-  - sudo add-apt-repository ppa:masterminds/glide -y
-  - sudo apt-get update
-  - sudo apt-get install glide -y
+  - go get -u github.com/Masterminds/glide github.com/golang/lint/golint
 
 install:
   - glide install
 
+before_script:
+  - go vet .
+  - golint .
+
 script:
-  - go test -race -covermode=atomic -coverprofile=coverage.txt .
+  - go test -covermode=atomic -coverprofile=coverage.txt .
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)

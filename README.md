@@ -12,7 +12,6 @@
 - Simple, Poetic, Pithy.
 - No `reflect` package.
   - But `reflect` package is used only when invoke the debug handler.
-- Support both packages `context` and `golang.org/x/net/context`.
 - Support GAE/Go Standard Environment.
 - Compliance with [JSON-RPC 2.0](http://www.jsonrpc.org/specification).
 
@@ -25,20 +24,20 @@ $ go get -u github.com/osamingo/jsonrpc
 ## Usage
 
 ```go
-package main
+package jsonrpc
 
 import (
-	"context"
 	"encoding/json"
 	"log"
 	"net/http"
 
 	"github.com/osamingo/jsonrpc"
+	"golang.org/x/net/context"
 )
 
 type (
-	EchoHandler struct {}
-	EchoParams struct {
+	EchoHandler struct{}
+	EchoParams  struct {
 		Name string `json:"name"`
 	}
 	EchoResult struct {
@@ -46,9 +45,7 @@ type (
 	}
 )
 
-var _ (jsonrpc.Handler) = (*EchoHandler)(nil)
-
-func (h *EchoHandler)ServeJSONRPC(c context.Context, params *json.RawMessage) (interface{}, *jsonrpc.Error) {
+func (h *EchoHandler) ServeJSONRPC(c context.Context, params *json.RawMessage) (interface{}, *jsonrpc.Error) {
 
 	var p EchoParams
 	if err := jsonrpc.Unmarshal(params, &p); err != nil {
@@ -65,7 +62,9 @@ func init() {
 }
 
 func main() {
-	http.HandleFunc("/jrpc", jsonrpc.HandlerFunc)
+	http.HandleFunc("/jrpc", func(w http.ResponseWriter, r *http.Request) {
+		jsonrpc.HandlerFunc(r.Context(), w, r)
+	})
 	http.HandleFunc("/jrpc/debug", jsonrpc.DebugHandlerFunc)
 	if err := http.ListenAndServe(":8080", nil); err != nil {
 		log.Fatalln(err)

@@ -15,8 +15,6 @@ const (
 	ErrorCodeInternal ErrorCode = -32603
 )
 
-var _ error = (*Error)(nil)
-
 type (
 	// A ErrorCode by JSON-RPC 2.0.
 	ErrorCode int
