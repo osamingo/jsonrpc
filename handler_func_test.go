@@ -16,7 +16,7 @@ type handler struct {
 	F func(c context.Context, params *json.RawMessage) (interface{}, *Error)
 }
 
-func (h handler) ServeJSONRPC(c context.Context, params *json.RawMessage) (interface{}, *Error) {
+func (h *handler) ServeJSONRPC(c context.Context, params *json.RawMessage) (interface{}, *Error) {
 	return h.F(c, params)
 }
 
@@ -47,11 +47,16 @@ func TestHandler(t *testing.T) {
 	require.NoError(t, err)
 	assert.NotNil(t, res.Error)
 
-	h := handler{}
-	h.F = func(c context.Context, params *json.RawMessage) (interface{}, *Error) {
+	h1 := &handler{}
+	h1.F = func(c context.Context, params *json.RawMessage) (interface{}, *Error) {
 		return "hello", nil
 	}
-	require.NoError(t, RegisterMethod("hello", h, nil, nil))
+	require.NoError(t, RegisterMethod("hello", h1, nil, nil))
+	h2 := &handler{}
+	h2.F = func(c context.Context, params *json.RawMessage) (interface{}, *Error) {
+		return nil, ErrInternal()
+	}
+	require.NoError(t, RegisterMethod("bye", h2, nil, nil))
 
 	rec = httptest.NewRecorder()
 	r, err = http.NewRequest("", "", bytes.NewReader([]byte(`{"jsonrpc":"2.0","id":"test","method":"hello","params":{}}`)))
@@ -64,4 +69,15 @@ func TestHandler(t *testing.T) {
 	require.NoError(t, err)
 	assert.Nil(t, res.Error)
 	assert.Equal(t, "hello", res.Result)
+
+	rec = httptest.NewRecorder()
+	r, err = http.NewRequest("", "", bytes.NewReader([]byte(`{"jsonrpc":"2.0","id":"test","method":"bye","params":{}}`)))
+	require.NoError(t, err)
+	r.Header.Set("Content-Type", "application/json")
+
+	HandlerFunc(c, rec, r)
+	res = Response{}
+	err = json.NewDecoder(rec.Body).Decode(&res)
+	require.NoError(t, err)
+	assert.NotNil(t, res.Error)
 }

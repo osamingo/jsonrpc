@@ -60,5 +60,5 @@ func SampleHandler() Handler {
 	h.F = func(c context.Context, params *json.RawMessage) (result interface{}, err *Error) {
 		return nil, nil
 	}
-	return h
+	return &h
 }
