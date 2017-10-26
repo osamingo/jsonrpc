@@ -1,13 +1,12 @@
 package jsonrpc
 
 import (
+	"context"
 	"net/http"
-
-	"golang.org/x/net/context"
 )
 
 // HandlerFunc provides basic JSON-RPC handling.
-func HandlerFunc(c context.Context, w http.ResponseWriter, r *http.Request) {
+func HandlerFunc(w http.ResponseWriter, r *http.Request) {
 
 	rs, batch, err := ParseRequest(r)
 	if err != nil {
@@ -22,7 +21,7 @@ func HandlerFunc(c context.Context, w http.ResponseWriter, r *http.Request) {
 
 	resp := make([]*Response, len(rs))
 	for i := range rs {
-		resp[i] = invokeMethod(c, rs[i])
+		resp[i] = invokeMethod(r.Context(), rs[i])
 	}
 
 	if err := SendResponse(w, resp, batch); err != nil {

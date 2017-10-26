@@ -1,12 +1,12 @@
 package jsonrpc
 
 import (
+	"context"
 	"encoding/json"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"golang.org/x/net/context"
 )
 
 func TestTakeMethod(t *testing.T) {

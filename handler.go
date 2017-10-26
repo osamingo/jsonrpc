@@ -1,9 +1,8 @@
 package jsonrpc
 
 import (
+	"context"
 	"encoding/json"
-
-	"golang.org/x/net/context"
 )
 
 // Handler links a method of JSON-RPC request.
