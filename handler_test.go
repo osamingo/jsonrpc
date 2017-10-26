@@ -22,13 +22,13 @@ func (h *handler) ServeJSONRPC(c context.Context, params *json.RawMessage) (inte
 
 func TestHandler(t *testing.T) {
 
-	PurgeMethods()
+	mr := NewMethodRepository()
 
 	rec := httptest.NewRecorder()
 	r, err := http.NewRequest("", "", nil)
 	require.NoError(t, err)
 
-	HandlerFunc(rec, r)
+	mr.ServeHTTP(rec, r)
 
 	res := Response{}
 	err = json.NewDecoder(rec.Body).Decode(&res)
@@ -40,7 +40,7 @@ func TestHandler(t *testing.T) {
 	require.NoError(t, err)
 	r.Header.Set("Content-Type", "application/json")
 
-	HandlerFunc(rec, r)
+	mr.ServeHTTP(rec, r)
 	res = Response{}
 	err = json.NewDecoder(rec.Body).Decode(&res)
 	require.NoError(t, err)
@@ -50,19 +50,19 @@ func TestHandler(t *testing.T) {
 	h1.F = func(c context.Context, params *json.RawMessage) (interface{}, *Error) {
 		return "hello", nil
 	}
-	require.NoError(t, RegisterMethod("hello", h1, nil, nil))
+	require.NoError(t, mr.RegisterMethod("hello", h1, nil, nil))
 	h2 := &handler{}
 	h2.F = func(c context.Context, params *json.RawMessage) (interface{}, *Error) {
 		return nil, ErrInternal()
 	}
-	require.NoError(t, RegisterMethod("bye", h2, nil, nil))
+	require.NoError(t, mr.RegisterMethod("bye", h2, nil, nil))
 
 	rec = httptest.NewRecorder()
 	r, err = http.NewRequest("", "", bytes.NewReader([]byte(`{"jsonrpc":"2.0","id":"test","method":"hello","params":{}}`)))
 	require.NoError(t, err)
 	r.Header.Set("Content-Type", "application/json")
 
-	HandlerFunc(rec, r)
+	mr.ServeHTTP(rec, r)
 	res = Response{}
 	err = json.NewDecoder(rec.Body).Decode(&res)
 	require.NoError(t, err)
@@ -74,7 +74,7 @@ func TestHandler(t *testing.T) {
 	require.NoError(t, err)
 	r.Header.Set("Content-Type", "application/json")
 
-	HandlerFunc(rec, r)
+	mr.ServeHTTP(rec, r)
 	res = Response{}
 	err = json.NewDecoder(rec.Body).Decode(&res)
 	require.NoError(t, err)
