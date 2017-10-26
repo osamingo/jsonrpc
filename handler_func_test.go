@@ -2,6 +2,7 @@ package jsonrpc
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
@@ -9,7 +10,6 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"golang.org/x/net/context"
 )
 
 type handler struct {
@@ -24,12 +24,11 @@ func TestHandler(t *testing.T) {
 
 	PurgeMethods()
 
-	c := context.Background()
 	rec := httptest.NewRecorder()
 	r, err := http.NewRequest("", "", nil)
 	require.NoError(t, err)
 
-	HandlerFunc(c, rec, r)
+	HandlerFunc(rec, r)
 
 	res := Response{}
 	err = json.NewDecoder(rec.Body).Decode(&res)
@@ -41,7 +40,7 @@ func TestHandler(t *testing.T) {
 	require.NoError(t, err)
 	r.Header.Set("Content-Type", "application/json")
 
-	HandlerFunc(c, rec, r)
+	HandlerFunc(rec, r)
 	res = Response{}
 	err = json.NewDecoder(rec.Body).Decode(&res)
 	require.NoError(t, err)
@@ -63,7 +62,7 @@ func TestHandler(t *testing.T) {
 	require.NoError(t, err)
 	r.Header.Set("Content-Type", "application/json")
 
-	HandlerFunc(c, rec, r)
+	HandlerFunc(rec, r)
 	res = Response{}
 	err = json.NewDecoder(rec.Body).Decode(&res)
 	require.NoError(t, err)
@@ -75,7 +74,7 @@ func TestHandler(t *testing.T) {
 	require.NoError(t, err)
 	r.Header.Set("Content-Type", "application/json")
 
-	HandlerFunc(c, rec, r)
+	HandlerFunc(rec, r)
 	res = Response{}
 	err = json.NewDecoder(rec.Body).Decode(&res)
 	require.NoError(t, err)
