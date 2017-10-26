@@ -19,13 +19,16 @@ type (
 	}
 )
 
-var mr = MethodRepository{
-	m: sync.RWMutex{},
-	r: map[string]Metadata{},
+// NewMethodRepository returns new MethodRepository.
+func NewMethodRepository() *MethodRepository {
+	return &MethodRepository{
+		m: sync.RWMutex{},
+		r: map[string]Metadata{},
+	}
 }
 
 // TakeMethod takes jsonrpc.Func in MethodRepository.
-func TakeMethod(r *Request) (Handler, *Error) {
+func (mr *MethodRepository) TakeMethod(r *Request) (Handler, *Error) {
 	if r.Method == "" || r.Version != Version {
 		return nil, ErrInvalidParams()
 	}
@@ -41,7 +44,7 @@ func TakeMethod(r *Request) (Handler, *Error) {
 }
 
 // RegisterMethod registers jsonrpc.Func to MethodRepository.
-func RegisterMethod(method string, h Handler, params, result interface{}) error {
+func (mr *MethodRepository) RegisterMethod(method string, h Handler, params, result interface{}) error {
 	if method == "" || h == nil {
 		return errors.New("jsonrpc: method name and function should not be empty")
 	}
@@ -56,7 +59,7 @@ func RegisterMethod(method string, h Handler, params, result interface{}) error 
 }
 
 // Methods returns registered methods.
-func Methods() map[string]Metadata {
+func (mr *MethodRepository) Methods() map[string]Metadata {
 	mr.m.RLock()
 	ml := make(map[string]Metadata, len(mr.r))
 	for k, md := range mr.r {
@@ -64,11 +67,4 @@ func Methods() map[string]Metadata {
 	}
 	mr.m.RUnlock()
 	return ml
-}
-
-// PurgeMethods purges all registered methods.
-func PurgeMethods() {
-	mr.m.Lock()
-	mr.r = map[string]Metadata{}
-	mr.m.Unlock()
 }

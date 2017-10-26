@@ -11,46 +11,52 @@ import (
 
 func TestTakeMethod(t *testing.T) {
 
+	mr := NewMethodRepository()
+
 	r := &Request{}
-	_, err := TakeMethod(r)
+	_, err := mr.TakeMethod(r)
 	require.IsType(t, &Error{}, err)
 	assert.Equal(t, ErrorCodeInvalidParams, err.Code)
 
 	r.Method = "test"
-	_, err = TakeMethod(r)
+	_, err = mr.TakeMethod(r)
 	require.IsType(t, &Error{}, err)
 	assert.Equal(t, ErrorCodeInvalidParams, err.Code)
 
 	r.Version = "2.0"
-	_, err = TakeMethod(r)
+	_, err = mr.TakeMethod(r)
 	require.IsType(t, &Error{}, err)
 	assert.Equal(t, ErrorCodeMethodNotFound, err.Code)
 
-	require.NoError(t, RegisterMethod("test", SampleHandler(), nil, nil))
+	require.NoError(t, mr.RegisterMethod("test", SampleHandler(), nil, nil))
 
-	f, err := TakeMethod(r)
+	f, err := mr.TakeMethod(r)
 	require.Nil(t, err)
 	assert.NotEmpty(t, f)
 }
 
 func TestRegisterMethod(t *testing.T) {
 
-	err := RegisterMethod("", nil, nil, nil)
+	mr := NewMethodRepository()
+
+	err := mr.RegisterMethod("", nil, nil, nil)
 	require.Error(t, err)
 
-	err = RegisterMethod("test", nil, nil, nil)
+	err = mr.RegisterMethod("test", nil, nil, nil)
 	require.Error(t, err)
 
-	err = RegisterMethod("test", SampleHandler(), nil, nil)
+	err = mr.RegisterMethod("test", SampleHandler(), nil, nil)
 	require.NoError(t, err)
 }
 
 func TestMethods(t *testing.T) {
 
-	err := RegisterMethod("JsonRpc.Sample", SampleHandler(), nil, nil)
+	mr := NewMethodRepository()
+
+	err := mr.RegisterMethod("JsonRpc.Sample", SampleHandler(), nil, nil)
 	require.NoError(t, err)
 
-	ml := Methods()
+	ml := mr.Methods()
 	require.NotEmpty(t, ml)
 	assert.NotEmpty(t, ml["JsonRpc.Sample"].Handler)
 }

@@ -16,9 +16,9 @@ type MethodReference struct {
 	Result  *jsonschema.Schema `json:"result,omitempty"`
 }
 
-// DebugHandlerFunc views registered method list.
-func DebugHandlerFunc(w http.ResponseWriter, r *http.Request) {
-	ms := Methods()
+// ServeDebug views registered method list.
+func (mr *MethodRepository) ServeDebug(w http.ResponseWriter, r *http.Request) {
+	ms := mr.Methods()
 	if len(ms) == 0 {
 		w.WriteHeader(http.StatusNotFound)
 		return

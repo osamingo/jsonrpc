@@ -11,17 +11,17 @@ import (
 
 func TestDebugHandler(t *testing.T) {
 
-	PurgeMethods()
+	mr := NewMethodRepository()
 
 	rec := httptest.NewRecorder()
 	r, err := http.NewRequest("", "", nil)
 	require.NoError(t, err)
 
-	DebugHandlerFunc(rec, r)
+	mr.ServeDebug(rec, r)
 
 	require.Equal(t, http.StatusNotFound, rec.Code)
 
-	require.NoError(t, RegisterMethod("Debug.Sample", SampleHandler(), struct {
+	require.NoError(t, mr.RegisterMethod("Debug.Sample", SampleHandler(), struct {
 		Name string `json:"name"`
 	}{}, struct {
 		Message string `json:"message,omitempty"`
@@ -31,7 +31,7 @@ func TestDebugHandler(t *testing.T) {
 	r, err = http.NewRequest("", "", nil)
 	require.NoError(t, err)
 
-	DebugHandlerFunc(rec, r)
+	mr.ServeDebug(rec, r)
 
 	require.Equal(t, http.StatusOK, rec.Code)
 	assert.NotEmpty(t, rec.Body.String())
