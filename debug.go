@@ -25,25 +25,29 @@ func (mr *MethodRepository) ServeDebug(w http.ResponseWriter, r *http.Request) {
 	}
 	l := make([]*MethodReference, 0, len(ms))
 	for k, md := range ms {
-		mr := &MethodReference{
-			Name: k,
-		}
-		tv := reflect.TypeOf(md.Handler)
-		if tv.Kind() == reflect.Ptr {
-			tv = tv.Elem()
-		}
-		mr.Handler = tv.Name()
-		if md.Params != nil {
-			mr.Params = jsonschema.Reflect(md.Params)
-		}
-		if md.Result != nil {
-			mr.Result = jsonschema.Reflect(md.Result)
-		}
-		l = append(l, mr)
+		l = append(l, makeMethodReference(k, md))
 	}
 	w.Header().Set(contentTypeKey, contentTypeValue)
 	if err := json.NewEncoder(w).Encode(l); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+}
+
+func makeMethodReference(k string, md Metadata) *MethodReference {
+	mr := &MethodReference{
+		Name: k,
+	}
+	tv := reflect.TypeOf(md.Handler)
+	if tv.Kind() == reflect.Ptr {
+		tv = tv.Elem()
+	}
+	mr.Handler = tv.Name()
+	if md.Params != nil {
+		mr.Params = jsonschema.Reflect(md.Params)
+	}
+	if md.Result != nil {
+		mr.Result = jsonschema.Reflect(md.Result)
+	}
+	return mr
 }
