@@ -21,7 +21,7 @@ type (
 	}
 )
 
-func (h *EchoHandler) ServeJSONRPC(c context.Context, params *json.RawMessage) (interface{}, *Error) {
+func (h EchoHandler) ServeJSONRPC(c context.Context, params *json.RawMessage) (interface{}, *Error) {
 
 	var p EchoParams
 	if err := Unmarshal(params, &p); err != nil {
@@ -37,7 +37,7 @@ func ExampleEchoHandler_ServeJSONRPC() {
 
 	mr := NewMethodRepository()
 
-	if err := mr.RegisterMethod("Main.Echo", &EchoHandler{}, EchoParams{}, EchoResult{}); err != nil {
+	if err := mr.RegisterMethod("Main.Echo", EchoHandler{}, EchoParams{}, EchoResult{}); err != nil {
 		log.Fatalln(err)
 	}
 

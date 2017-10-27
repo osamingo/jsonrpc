@@ -15,7 +15,7 @@
 - Support GAE/Go Standard Environment.
 - Compliance with [JSON-RPC 2.0](http://www.jsonrpc.org/specification).
 
-Note: If you use Go 1.6, use [v1.0](https://github.com/osamingo/jsonrpc/releases/tag/v1.0).
+Note: If you use Go 1.6, see [v1.0](https://github.com/osamingo/jsonrpc/releases/tag/v1.0).
 
 ## Install
 
@@ -26,7 +26,7 @@ $ go get -u github.com/osamingo/jsonrpc
 ## Usage
 
 ```go
-package jsonrpc
+package main
 
 import (
 	"bytes"
@@ -37,6 +37,8 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"os"
+	
+	"github.com/osamingo/jsonrpc"
 )
 
 type (
@@ -49,10 +51,10 @@ type (
 	}
 )
 
-func (h *EchoHandler) ServeJSONRPC(c context.Context, params *json.RawMessage) (interface{}, *Error) {
+func (h EchoHandler) ServeJSONRPC(c context.Context, params *json.RawMessage) (interface{}, *Error) {
 
 	var p EchoParams
-	if err := Unmarshal(params, &p); err != nil {
+	if err := jsonrpc.Unmarshal(params, &p); err != nil {
 		return nil, err
 	}
 
@@ -65,7 +67,7 @@ func main() {
 	
 	mr := jsonrpc.NewMethodRepository()
 	
-	if err := mr.RegisterMethod("Main.Echo", &EchoHandler{}, EchoParams{}, EchoResult{}); err != nil {
+	if err := mr.RegisterMethod("Main.Echo", EchoHandler{}, EchoParams{}, EchoResult{}); err != nil {
     	log.Fatalln(err)
     }
     
