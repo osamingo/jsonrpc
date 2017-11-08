@@ -29,15 +29,11 @@ $ go get -u github.com/osamingo/jsonrpc
 package main
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
-	"io"
 	"log"
 	"net/http"
-	"net/http/httptest"
-	"os"
-	
+
 	"github.com/osamingo/jsonrpc"
 )
 
@@ -64,15 +60,15 @@ func (h EchoHandler) ServeJSONRPC(c context.Context, params *json.RawMessage) (i
 }
 
 func main() {
-	
+
 	mr := jsonrpc.NewMethodRepository()
-	
+
 	if err := mr.RegisterMethod("Main.Echo", EchoHandler{}, EchoParams{}, EchoResult{}); err != nil {
-    	log.Fatalln(err)
-    }
-    
-    http.Handle("/jrpc", mr)
-    http.HandleFunc("/jrpc/debug", mr.ServeDebug)
+		log.Fatalln(err)
+	}
+
+	http.Handle("/jrpc", mr)
+	http.HandleFunc("/jrpc/debug", mr.ServeDebug)
 	if err := http.ListenAndServe(":8080", nil); err != nil {
 		log.Fatalln(err)
 	}
