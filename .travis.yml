@@ -2,8 +2,8 @@ sudo: false
 
 language: go
 go:
-  - 1.8.5
-  - 1.9.2
+  - 1.8.x
+  - 1.9.x
   - tip
 
 matrix:
@@ -11,18 +11,20 @@ matrix:
   - go: tip
 
 before_install:
-  - go get -u github.com/golang/dep/cmd/dep github.com/golang/lint/golint honnef.co/go/tools/cmd/staticcheck
+  - go get -u github.com/golang/dep/cmd/dep github.com/golang/lint/golint honnef.co/go/tools/cmd/megacheck
+  - npm install -g codeclimate-test-reporter
 
 install:
   - dep ensure
 
 before_script:
   - go vet
-  - golint
-  - staticcheck
+  - golint -set_exit_status=1
+  - megacheck
 
 script:
-  - go test -covermode=atomic -coverprofile=coverage.txt .
+  - go test -covermode=atomic -coverprofile=coverage.txt
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
+  - codeclimate-test-reporter < coverage.txt
