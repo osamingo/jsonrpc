@@ -1,3 +1,4 @@
+version: "2"
 engines:
   gofmt:
     enabled: true
@@ -7,6 +8,6 @@ engines:
     enabled: true
 ratings:
   paths:
-    - "**.go"
+    - "*.go"
 exclude_paths:
   - vendor/
