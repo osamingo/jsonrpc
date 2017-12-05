@@ -14,6 +14,12 @@
   version = "v1.1.0"
 
 [[projects]]
+  branch = "master"
+  name = "github.com/intel-go/fastjson"
+  packages = ["."]
+  revision = "f846ae58a1ab4a99d9480ce565601aebd84e333a"
+
+[[projects]]
   name = "github.com/pmezard/go-difflib"
   packages = ["difflib"]
   revision = "792786c7400a136282c1664665ae0a8db921c6c2"
@@ -25,15 +31,9 @@
   revision = "69483b4bd14f5845b5a1e55bca19e954e827f1d0"
   version = "v1.1.4"
 
-[[projects]]
-  branch = "master"
-  name = "golang.org/x/net"
-  packages = ["context"]
-  revision = "4b14673ba32bee7f5ac0f990a48f033919fd418b"
-
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "71c65448af820f4c642d977244d3fc045769c023d1a18414a5d46a8763fea696"
+  inputs-digest = "26a1a3d4114c9e735859cfba1bd446dc1c96954218fbe4a7be78d1c4b4493b5a"
   solver-name = "gps-cdcl"
   solver-version = 1
