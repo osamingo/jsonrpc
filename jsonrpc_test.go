@@ -2,11 +2,11 @@ package jsonrpc
 
 import (
 	"bytes"
-	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
+	"github.com/intel-go/fastjson"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -65,7 +65,7 @@ func TestParseRequest(t *testing.T) {
 }
 
 func TestNewResponse(t *testing.T) {
-	id := json.RawMessage("test")
+	id := fastjson.RawMessage("test")
 	r := NewResponse(&Request{
 		Version: "2.0",
 		ID:      &id,
@@ -81,7 +81,7 @@ func TestSendResponse(t *testing.T) {
 	require.NoError(t, err)
 	assert.Empty(t, rec.Body.String())
 
-	id := json.RawMessage([]byte(`"test"`))
+	id := fastjson.RawMessage([]byte(`"test"`))
 	r := &Response{
 		ID:      &id,
 		Version: "2.0",

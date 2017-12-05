@@ -2,18 +2,18 @@ package jsonrpc
 
 import (
 	"context"
-	"encoding/json"
 	"testing"
 
+	"github.com/intel-go/fastjson"
 	"github.com/stretchr/testify/require"
 )
 
 func TestRequestID(t *testing.T) {
 
 	c := context.Background()
-	id := json.RawMessage("1")
+	id := fastjson.RawMessage("1")
 	c = WithRequestID(c, &id)
-	var pick *json.RawMessage
+	var pick *fastjson.RawMessage
 	require.NotPanics(t, func() {
 		pick = RequestID(c)
 	})
