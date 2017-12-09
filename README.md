@@ -79,13 +79,13 @@ func main() {
 	defer srv.Close()
 
 	resp, err := http.Post(srv.URL+"/jrpc", "application/json", bytes.NewBufferString(`{
-	  "jsonrpc": "2.0",
-      "method": "Main.Echo",
-      "params": {
-        "name": "John Doe"
-      },
-      "id": "243a718a-2ebb-4e32-8cc8-210c39e8a14b"
-    }`))
+          "jsonrpc": "2.0",
+          "method": "Main.Echo",
+          "params": {
+            "name": "John Doe"
+          },
+          "id": "243a718a-2ebb-4e32-8cc8-210c39e8a14b"
+        }`))
 	if err != nil {
 		log.Fatalln(err)
 	}
