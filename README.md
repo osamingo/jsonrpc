@@ -5,7 +5,6 @@
 [![Test Coverage](https://api.codeclimate.com/v1/badges/e820b394cdbd47103165/test_coverage)](https://codeclimate.com/github/osamingo/jsonrpc/test_coverage)
 [![Go Report Card](https://goreportcard.com/badge/osamingo/jsonrpc)](https://goreportcard.com/report/osamingo/jsonrpc)
 [![codebeat badge](https://codebeat.co/badges/cbd0290d-200b-4693-80dc-296d9447c35b)](https://codebeat.co/projects/github-com-osamingo-jsonrpc)
-[![Maintainability](https://api.codeclimate.com/v1/badges/e820b394cdbd47103165/maintainability)](https://codeclimate.com/github/osamingo/jsonrpc/maintainability)
 [![GoDoc](https://godoc.org/github.com/osamingo/jsonrpc?status.svg)](https://godoc.org/github.com/osamingo/jsonrpc)
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/osamingo/jsonrpc/master/LICENSE)
 
@@ -31,11 +30,15 @@ $ go get -u github.com/osamingo/jsonrpc
 package main
 
 import (
+	"bytes"
 	"context"
-	"encoding/json"
+	"io"
 	"log"
 	"net/http"
+	"net/http/httptest"
+	"os"
 
+	"github.com/intel-go/fastjson"
 	"github.com/osamingo/jsonrpc"
 )
 
@@ -49,7 +52,7 @@ type (
 	}
 )
 
-func (h EchoHandler) ServeJSONRPC(c context.Context, params *json.RawMessage) (interface{}, *Error) {
+func (h EchoHandler) ServeJSONRPC(c context.Context, params *fastjson.RawMessage) (interface{}, *jsonrpc.Error) {
 
 	var p EchoParams
 	if err := jsonrpc.Unmarshal(params, &p); err != nil {
@@ -71,7 +74,23 @@ func main() {
 
 	http.Handle("/jrpc", mr)
 	http.HandleFunc("/jrpc/debug", mr.ServeDebug)
-	if err := http.ListenAndServe(":8080", nil); err != nil {
+
+	srv := httptest.NewServer(http.DefaultServeMux)
+	defer srv.Close()
+
+	resp, err := http.Post(srv.URL+"/jrpc", "application/json", bytes.NewBufferString(`{
+	  "jsonrpc": "2.0",
+      "method": "Main.Echo",
+      "params": {
+        "name": "John Doe"
+      },
+      "id": "243a718a-2ebb-4e32-8cc8-210c39e8a14b"
+    }`))
+	if err != nil {
+		log.Fatalln(err)
+	}
+	defer resp.Body.Close()
+	if _, err := io.Copy(os.Stdout, resp.Body); err != nil {
 		log.Fatalln(err)
 	}
 }
