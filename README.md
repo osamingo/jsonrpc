@@ -31,13 +31,9 @@ $ go get -u github.com/osamingo/jsonrpc
 package main
 
 import (
-	"bytes"
 	"context"
-	"io"
 	"log"
 	"net/http"
-	"net/http/httptest"
-	"os"
 
 	"github.com/intel-go/fastjson"
 	"github.com/osamingo/jsonrpc"
@@ -76,22 +72,69 @@ func main() {
 	http.Handle("/jrpc", mr)
 	http.HandleFunc("/jrpc/debug", mr.ServeDebug)
 
-	srv := httptest.NewServer(http.DefaultServeMux)
-	defer srv.Close()
-
-	resp, err := http.Post(srv.URL+"/jrpc", "application/json", bytes.NewBufferString(`{
-          "jsonrpc": "2.0",
-          "method": "Main.Echo",
-          "params": {
-            "name": "John Doe"
-          },
-          "id": "243a718a-2ebb-4e32-8cc8-210c39e8a14b"
-        }`))
-	if err != nil {
+	if err := http.ListenAndServe(":8080", http.DefaultServeMux); err != nil {
 		log.Fatalln(err)
 	}
-	defer resp.Body.Close()
-	if _, err := io.Copy(os.Stdout, resp.Body); err != nil {
+}
+```
+
+#### Advanced
+
+```go
+package main
+
+import (
+	"log"
+	"net/http"
+
+	"github.com/osamingo/jsonrpc"
+)
+
+type (
+	HandleParamsResulter interface {
+		jsonrpc.Handler
+		Name() string
+		Params() interface{}
+		Result() interface{}
+	}
+	Servicer interface {
+		MethodName(HandleParamsResulter) string
+		Handlers() []HandleParamsResulter
+	}
+	UserService struct {
+		SignUpHandler HandleParamsResulter
+		SignInHandler HandleParamsResulter
+	}
+)
+
+func (us *UserService) MethodName(h HandleParamsResulter) string {
+	return "UserService." + h.Name()
+}
+
+func (us *UserService) Handlers() []HandleParamsResulter {
+	return []HandleParamsResulter{us.SignUpHandler, us.SignInHandler}
+}
+
+func NewUserService() *UserService {
+	return &UserService{
+	// Initialize handlers
+	}
+}
+
+func main() {
+
+	mr := jsonrpc.NewMethodRepository()
+
+	for _, s := range []Servicer{NewUserService()} {
+		for _, h := range s.Handlers() {
+			mr.RegisterMethod(s.MethodName(h), h, h.Params(), h.Result())
+		}
+	}
+
+	http.Handle("/jrpc", mr)
+	http.HandleFunc("/jrpc/debug", mr.ServeDebug)
+
+	if err := http.ListenAndServe(":8080", http.DefaultServeMux); err != nil {
 		log.Fatalln(err)
 	}
 }
