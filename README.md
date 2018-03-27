@@ -2,7 +2,6 @@
 
 [![Travis branch](https://img.shields.io/travis/osamingo/jsonrpc/master.svg)](https://travis-ci.org/osamingo/jsonrpc)
 [![codecov](https://codecov.io/gh/osamingo/jsonrpc/branch/master/graph/badge.svg)](https://codecov.io/gh/osamingo/jsonrpc)
-[![Test Coverage](https://api.codeclimate.com/v1/badges/e820b394cdbd47103165/test_coverage)](https://codeclimate.com/github/osamingo/jsonrpc/test_coverage)
 [![Go Report Card](https://goreportcard.com/badge/osamingo/jsonrpc)](https://goreportcard.com/report/osamingo/jsonrpc)
 [![codebeat badge](https://codebeat.co/badges/cbd0290d-200b-4693-80dc-296d9447c35b)](https://codebeat.co/projects/github-com-osamingo-jsonrpc)
 [![Maintainability](https://api.codeclimate.com/v1/badges/e820b394cdbd47103165/maintainability)](https://codeclimate.com/github/osamingo/jsonrpc/maintainability)
