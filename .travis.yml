@@ -9,6 +9,7 @@ go:
 
 matrix:
   allow_failures:
+  - go: 1.8.x
   - go: tip
 
 before_install:
