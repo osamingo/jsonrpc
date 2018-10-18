@@ -12,7 +12,7 @@ matrix:
   - go: tip
 
 before_install:
-  - go get -u github.com/golang/dep/cmd/dep github.com/golang/lint/golint honnef.co/go/tools/cmd/megacheck
+  - go get -u github.com/golang/dep/cmd/dep golang.org/x/lint/golint honnef.co/go/tools/cmd/megacheck
 
 install:
   - dep ensure
