@@ -46,6 +46,12 @@ type (
 	EchoResult struct {
 		Message string `json:"message"`
 	}
+
+	PositionalHandler struct{}
+	PositionalParams  []int
+	PositionalResult  struct {
+		Message []int `json:"message"`
+	}
 )
 
 func (h EchoHandler) ServeJSONRPC(c context.Context, params *fastjson.RawMessage) (interface{}, *jsonrpc.Error) {
@@ -60,11 +66,27 @@ func (h EchoHandler) ServeJSONRPC(c context.Context, params *fastjson.RawMessage
 	}, nil
 }
 
+func (h PositionalHandler) ServeJSONRPC(c context.Context, params *fastjson.RawMessage) (interface{}, *Error) {
+
+	var p PositionalParams
+	if err := Unmarshal(params, &p); err != nil {
+		return nil, err
+	}
+
+	return PositionalResult{
+		Message: p,
+	}, nil
+}
+
 func main() {
 
 	mr := jsonrpc.NewMethodRepository()
 
 	if err := mr.RegisterMethod("Main.Echo", EchoHandler{}, EchoParams{}, EchoResult{}); err != nil {
+		log.Fatalln(err)
+	}
+
+	if err := mr.RegisterMethod("Main.Positional", PositionalHandler{}, PositionalParams{}, PositionalResult{}); err != nil {
 		log.Fatalln(err)
 	}
 
@@ -176,6 +198,39 @@ Date: Mon, 28 Nov 2016 13:48:13 GMT
 }
 ```
 
+#### Invoke the Positional method
+
+```
+POST /jrpc HTTP/1.1
+Accept: */*
+Content-Length: 133
+Content-Type: application/json
+Host: localhost:8080
+User-Agent: curl/7.61.1
+
+{
+  "jsonrpc": "2.0",
+  "method": "Main.Positional",
+  "params": [3,1,1,3,5,3],
+  "id": "243a718a-2ebb-4e32-8cc8-210c39e8a14b"
+}
+
+HTTP/1.1 200 OK
+Content-Length: 97
+Content-Type: application/json
+Date: Mon, 05 Nov 2018 11:23:35 GMT
+
+{
+  "jsonrpc": "2.0",
+  "result": {
+    "message": [3,1,1,3,5,3]
+  },
+  "id": "243a718a-2ebb-4e32-8cc8-210c39e8a14b"
+}
+
+```
+
+
 #### Access to debug handler
 
 ```
@@ -185,8 +240,6 @@ Accept-Encoding: gzip, deflate
 Connection: keep-alive
 Host: localhost:8080
 User-Agent: HTTPie/0.9.6
-
-
 
 HTTP/1.1 200 OK
 Content-Length: 408
