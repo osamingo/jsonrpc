@@ -20,23 +20,25 @@ const (
 type (
 	// A Request represents a JSON-RPC request received by the server.
 	Request struct {
-		ID      *fastjson.RawMessage `json:"id"`
 		Version string               `json:"jsonrpc"`
 		Method  string               `json:"method"`
 		Params  *fastjson.RawMessage `json:"params"`
+		ID      *fastjson.RawMessage `json:"id"`
 	}
 
 	// A Response represents a JSON-RPC response returned by the server.
 	Response struct {
-		ID      *fastjson.RawMessage `json:"id,omitempty"`
 		Version string               `json:"jsonrpc"`
 		Result  interface{}          `json:"result,omitempty"`
 		Error   *Error               `json:"error,omitempty"`
+		ID      *fastjson.RawMessage `json:"id,omitempty"`
 	}
 )
 
 // ParseRequest parses a HTTP request to JSON-RPC request.
 func ParseRequest(r *http.Request) ([]*Request, bool, *Error) {
+
+	var rerr *Error
 
 	if !strings.HasPrefix(r.Header.Get(contentTypeKey), contentTypeValue) {
 		return nil, false, ErrInvalidRequest()
@@ -46,7 +48,12 @@ func ParseRequest(r *http.Request) ([]*Request, bool, *Error) {
 	if _, err := buf.ReadFrom(r.Body); err != nil {
 		return nil, false, ErrInvalidRequest()
 	}
-	defer r.Body.Close()
+	defer func(r *http.Request) {
+		err := r.Body.Close()
+		if err != nil {
+			rerr = ErrInternal()
+		}
+	}(r)
 
 	if buf.Len() == 0 {
 		return nil, false, ErrInvalidRequest()
@@ -73,7 +80,7 @@ func ParseRequest(r *http.Request) ([]*Request, bool, *Error) {
 		return nil, false, ErrParse()
 	}
 
-	return rs, true, nil
+	return rs, true, rerr
 }
 
 // NewResponse generates a JSON-RPC response.

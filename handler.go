@@ -17,12 +17,15 @@ func (mr *MethodRepository) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	rs, batch, err := ParseRequest(r)
 	if err != nil {
-		SendResponse(w, []*Response{
+		err := SendResponse(w, []*Response{
 			{
 				Version: Version,
 				Error:   err,
 			},
 		}, false)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+		}
 		return
 	}
 

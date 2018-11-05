@@ -101,6 +101,6 @@ func ExampleEchoHandler_ServeJSONRPC() {
 	}
 
 	// Output:
-	// {"id":"243a718a-2ebb-4e32-8cc8-210c39e8a14b","jsonrpc":"2.0","result":{"message":"Hello, John Doe"}}
-	// {"id":"243a718a-2ebb-4e32-8cc8-210c39e8a14b","jsonrpc":"2.0","result":{"message":[3,1,1,3,5,3]}}
+	// {"jsonrpc":"2.0","result":{"message":"Hello, John Doe"},"id":"243a718a-2ebb-4e32-8cc8-210c39e8a14b"}
+  // {"jsonrpc":"2.0","result":{"message":[3,1,1,3,5,3]},"id":"243a718a-2ebb-4e32-8cc8-210c39e8a14b"}
 }
