@@ -17,7 +17,7 @@ type MethodReference struct {
 }
 
 // ServeDebug views registered method list.
-func (mr *MethodRepository) ServeDebug(w http.ResponseWriter, r *http.Request) {
+func (mr *MethodRepository) ServeDebug(w http.ResponseWriter, r *http.Request) { // nolint: unparam
 	ms := mr.Methods()
 	if len(ms) == 0 {
 		w.WriteHeader(http.StatusNotFound)
