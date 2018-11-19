@@ -4,12 +4,12 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/intel-go/fastjson"
+	json "github.com/json-iterator/go"
 )
 
 // Handler links a method of JSON-RPC request.
 type Handler interface {
-	ServeJSONRPC(c context.Context, params *fastjson.RawMessage) (result interface{}, err *Error)
+	ServeJSONRPC(c context.Context, params *json.RawMessage) (result interface{}, err *Error)
 }
 
 // ServeHTTP provides basic JSON-RPC handling.
@@ -17,12 +17,15 @@ func (mr *MethodRepository) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	rs, batch, err := ParseRequest(r)
 	if err != nil {
-		SendResponse(w, []*Response{
+		if err := SendResponse(w, []*Response{
 			{
 				Version: Version,
 				Error:   err,
 			},
-		}, false)
+		}, false); err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+		}
+
 		return
 	}
 

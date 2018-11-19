@@ -34,7 +34,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/intel-go/fastjson"
+	json "github.com/json-iterator/go"
 	"github.com/osamingo/jsonrpc"
 )
 
@@ -48,7 +48,7 @@ type (
 	}
 )
 
-func (h EchoHandler) ServeJSONRPC(c context.Context, params *fastjson.RawMessage) (interface{}, *jsonrpc.Error) {
+func (h EchoHandler) ServeJSONRPC(c context.Context, params *json.RawMessage) (interface{}, *jsonrpc.Error) {
 
 	var p EchoParams
 	if err := jsonrpc.Unmarshal(params, &p); err != nil {

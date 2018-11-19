@@ -7,16 +7,16 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/intel-go/fastjson"
+	json "github.com/json-iterator/go"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
 type handler struct {
-	F func(c context.Context, params *fastjson.RawMessage) (interface{}, *Error)
+	F func(c context.Context, params *json.RawMessage) (interface{}, *Error)
 }
 
-func (h *handler) ServeJSONRPC(c context.Context, params *fastjson.RawMessage) (interface{}, *Error) {
+func (h *handler) ServeJSONRPC(c context.Context, params *json.RawMessage) (interface{}, *Error) {
 	return h.F(c, params)
 }
 
@@ -31,7 +31,7 @@ func TestHandler(t *testing.T) {
 	mr.ServeHTTP(rec, r)
 
 	res := Response{}
-	err = fastjson.NewDecoder(rec.Body).Decode(&res)
+	err = json.NewDecoder(rec.Body).Decode(&res)
 	require.NoError(t, err)
 	assert.NotNil(t, res.Error)
 
@@ -42,17 +42,17 @@ func TestHandler(t *testing.T) {
 
 	mr.ServeHTTP(rec, r)
 	res = Response{}
-	err = fastjson.NewDecoder(rec.Body).Decode(&res)
+	err = json.NewDecoder(rec.Body).Decode(&res)
 	require.NoError(t, err)
 	assert.NotNil(t, res.Error)
 
 	h1 := &handler{}
-	h1.F = func(c context.Context, params *fastjson.RawMessage) (interface{}, *Error) {
+	h1.F = func(c context.Context, params *json.RawMessage) (interface{}, *Error) {
 		return "hello", nil
 	}
 	require.NoError(t, mr.RegisterMethod("hello", h1, nil, nil))
 	h2 := &handler{}
-	h2.F = func(c context.Context, params *fastjson.RawMessage) (interface{}, *Error) {
+	h2.F = func(c context.Context, params *json.RawMessage) (interface{}, *Error) {
 		return nil, ErrInternal()
 	}
 	require.NoError(t, mr.RegisterMethod("bye", h2, nil, nil))
@@ -64,7 +64,7 @@ func TestHandler(t *testing.T) {
 
 	mr.ServeHTTP(rec, r)
 	res = Response{}
-	err = fastjson.NewDecoder(rec.Body).Decode(&res)
+	err = json.NewDecoder(rec.Body).Decode(&res)
 	require.NoError(t, err)
 	assert.Nil(t, res.Error)
 	assert.Equal(t, "hello", res.Result)
@@ -76,7 +76,7 @@ func TestHandler(t *testing.T) {
 
 	mr.ServeHTTP(rec, r)
 	res = Response{}
-	err = fastjson.NewDecoder(rec.Body).Decode(&res)
+	err = json.NewDecoder(rec.Body).Decode(&res)
 	require.NoError(t, err)
 	assert.NotNil(t, res.Error)
 }

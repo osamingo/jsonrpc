@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/intel-go/fastjson"
+	json "github.com/json-iterator/go"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -63,7 +63,7 @@ func TestMethods(t *testing.T) {
 
 func SampleHandler() Handler {
 	h := handler{}
-	h.F = func(c context.Context, params *fastjson.RawMessage) (result interface{}, err *Error) {
+	h.F = func(c context.Context, params *json.RawMessage) (result interface{}, err *Error) {
 		return nil, nil
 	}
 	return &h

@@ -9,7 +9,7 @@ import (
 	"net/http/httptest"
 	"os"
 
-	"github.com/intel-go/fastjson"
+	json "github.com/json-iterator/go"
 )
 
 type (
@@ -22,7 +22,7 @@ type (
 	}
 )
 
-func (h EchoHandler) ServeJSONRPC(c context.Context, params *fastjson.RawMessage) (interface{}, *Error) {
+func (h EchoHandler) ServeJSONRPC(c context.Context, params *json.RawMessage) (interface{}, *Error) {
 
 	var p EchoParams
 	if err := Unmarshal(params, &p); err != nil {
@@ -60,7 +60,7 @@ func ExampleEchoHandler_ServeJSONRPC() {
 		log.Fatalln(err)
 	}
 	defer resp.Body.Close()
-	if _, err := io.Copy(os.Stdout, resp.Body); err != nil {
+	if _, err = io.Copy(os.Stdout, resp.Body); err != nil {
 		log.Fatalln(err)
 	}
 

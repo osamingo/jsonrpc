@@ -4,4 +4,4 @@
 
 [[constraint]]
   branch = "master"
-  name = "github.com/intel-go/fastjson"
+  name = "github.com/json-iterator/go"

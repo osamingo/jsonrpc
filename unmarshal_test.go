@@ -3,7 +3,7 @@ package jsonrpc
 import (
 	"testing"
 
-	"github.com/intel-go/fastjson"
+	json "github.com/json-iterator/go"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -14,9 +14,9 @@ func TestUnmarshal(t *testing.T) {
 	require.IsType(t, &Error{}, err)
 	assert.Equal(t, ErrorCodeInvalidParams, err.Code)
 
-	src := fastjson.RawMessage([]byte(`{"name":"john"}`))
+	src := json.RawMessage([]byte(`{"name":"john"}`))
 
-	Unmarshal(&src, nil)
+	_ = Unmarshal(&src, nil)
 	require.IsType(t, &Error{}, err)
 	assert.Equal(t, ErrorCodeInvalidParams, err.Code)
 
