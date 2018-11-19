@@ -20,18 +20,18 @@ const (
 type (
 	// A Request represents a JSON-RPC request received by the server.
 	Request struct {
-		ID      *json.RawMessage `json:"id"`
-		Version string           `json:"jsonrpc"`
-		Method  string           `json:"method"`
+		Version string               `json:"jsonrpc"`
+		Method  string               `json:"method"`
 		Params  *json.RawMessage `json:"params"`
+		ID      *json.RawMessage `json:"id"`
 	}
 
 	// A Response represents a JSON-RPC response returned by the server.
 	Response struct {
+		Version string               `json:"jsonrpc"`
+		Result  interface{}          `json:"result,omitempty"`
+		Error   *Error               `json:"error,omitempty"`
 		ID      *json.RawMessage `json:"id,omitempty"`
-		Version string           `json:"jsonrpc"`
-		Result  interface{}      `json:"result,omitempty"`
-		Error   *Error           `json:"error,omitempty"`
 	}
 )
 

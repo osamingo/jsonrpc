@@ -95,18 +95,18 @@ func TestSendResponse(t *testing.T) {
 	rec = httptest.NewRecorder()
 	err = SendResponse(rec, []*Response{r}, false)
 	require.NoError(t, err)
-	assert.Equal(t, `{"id":"test","jsonrpc":"2.0","result":{"name":"john"}}
+	assert.Equal(t, `{"jsonrpc":"2.0","result":{"name":"john"},"id":"test"}
 `, rec.Body.String())
 
 	rec = httptest.NewRecorder()
 	err = SendResponse(rec, []*Response{r}, true)
 	require.NoError(t, err)
-	assert.Equal(t, `[{"id":"test","jsonrpc":"2.0","result":{"name":"john"}}]
+	assert.Equal(t, `[{"jsonrpc":"2.0","result":{"name":"john"},"id":"test"}]
 `, rec.Body.String())
 
 	rec = httptest.NewRecorder()
 	err = SendResponse(rec, []*Response{r, r}, false)
 	require.NoError(t, err)
-	assert.Equal(t, `[{"id":"test","jsonrpc":"2.0","result":{"name":"john"}},{"id":"test","jsonrpc":"2.0","result":{"name":"john"}}]
+	assert.Equal(t, `[{"jsonrpc":"2.0","result":{"name":"john"},"id":"test"},{"jsonrpc":"2.0","result":{"name":"john"},"id":"test"}]
 `, rec.Body.String())
 }
