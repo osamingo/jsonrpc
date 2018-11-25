@@ -12,15 +12,13 @@ matrix:
   - go: tip
 
 before_install:
-  - go get -u github.com/golang/dep/cmd/dep golang.org/x/lint/golint honnef.co/go/tools/cmd/megacheck
+  - go get -u github.com/golang/dep/cmd/dep github.com/golangci/golangci-lint/cmd/golangci-lint
 
 install:
   - dep ensure
 
 before_script:
-  - go vet
-  - golint -set_exit_status=1
-  - megacheck
+  - golangci-lint run
 
 script:
   - go test -covermode=atomic -coverprofile=coverage.txt
