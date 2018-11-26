@@ -13,50 +13,62 @@ import (
 
 func TestParseRequest(t *testing.T) {
 
-	r, _ := http.NewRequest("", "", bytes.NewReader(nil))
+	r, rerr := http.NewRequest("", "", bytes.NewReader(nil))
+	require.NoError(t, rerr)
 
 	_, _, err := ParseRequest(r)
 	require.IsType(t, &Error{}, err)
 	assert.Equal(t, ErrorCodeInvalidRequest, err.Code)
 
 	r.Header.Set("Content-Type", "application/json")
-
 	_, _, err = ParseRequest(r)
 	require.IsType(t, &Error{}, err)
 	assert.Equal(t, ErrorCodeInvalidRequest, err.Code)
 
-	r, _ = http.NewRequest("", "", bytes.NewReader([]byte("")))
+	r, rerr = http.NewRequest("", "", bytes.NewReader([]byte("")))
+	require.NoError(t, rerr)
+
 	r.Header.Set("Content-Type", "application/json")
 	_, _, err = ParseRequest(r)
 	require.IsType(t, &Error{}, err)
 	assert.Equal(t, ErrorCodeInvalidRequest, err.Code)
 
-	r, _ = http.NewRequest("", "", bytes.NewReader([]byte("test")))
+	r, rerr = http.NewRequest("", "", bytes.NewReader([]byte("test")))
+	require.NoError(t, rerr)
+
 	r.Header.Set("Content-Type", "application/json")
 	_, _, err = ParseRequest(r)
 	require.IsType(t, &Error{}, err)
 	assert.Equal(t, ErrorCodeParse, err.Code)
 
-	r, _ = http.NewRequest("", "", bytes.NewReader([]byte("{}")))
+	r, rerr = http.NewRequest("", "", bytes.NewReader([]byte("{}")))
+	require.NoError(t, rerr)
+
 	r.Header.Set("Content-Type", "application/json")
 	rs, batch, err := ParseRequest(r)
 	require.Nil(t, err)
 	require.NotEmpty(t, rs)
 	assert.False(t, batch)
 
-	r, _ = http.NewRequest("", "", bytes.NewReader([]byte("[")))
+	r, rerr = http.NewRequest("", "", bytes.NewReader([]byte("[")))
+	require.NoError(t, rerr)
+
 	r.Header.Set("Content-Type", "application/json")
 	_, _, err = ParseRequest(r)
 	require.IsType(t, &Error{}, err)
 	assert.Equal(t, ErrorCodeParse, err.Code)
 
-	r, _ = http.NewRequest("", "", bytes.NewReader([]byte("[test]")))
+	r, rerr = http.NewRequest("", "", bytes.NewReader([]byte("[test]")))
+	require.NoError(t, rerr)
+
 	r.Header.Set("Content-Type", "application/json")
 	_, _, err = ParseRequest(r)
 	require.IsType(t, &Error{}, err)
 	assert.Equal(t, ErrorCodeParse, err.Code)
 
-	r, _ = http.NewRequest("", "", bytes.NewReader([]byte("[{}]")))
+	r, rerr = http.NewRequest("", "", bytes.NewReader([]byte("[{}]")))
+	require.NoError(t, rerr)
+
 	r.Header.Set("Content-Type", "application/json")
 	rs, batch, err = ParseRequest(r)
 	require.Nil(t, err)
@@ -95,18 +107,21 @@ func TestSendResponse(t *testing.T) {
 	rec = httptest.NewRecorder()
 	err = SendResponse(rec, []*Response{r}, false)
 	require.NoError(t, err)
-	assert.Equal(t, `{"jsonrpc":"2.0","result":{"name":"john"},"id":"test"}
+	assert.Equal(t,
+		`{"jsonrpc":"2.0","result":{"name":"john"},"id":"test"}
 `, rec.Body.String())
 
 	rec = httptest.NewRecorder()
 	err = SendResponse(rec, []*Response{r}, true)
 	require.NoError(t, err)
-	assert.Equal(t, `[{"jsonrpc":"2.0","result":{"name":"john"},"id":"test"}]
+	assert.Equal(t,
+		`[{"jsonrpc":"2.0","result":{"name":"john"},"id":"test"}]
 `, rec.Body.String())
 
 	rec = httptest.NewRecorder()
 	err = SendResponse(rec, []*Response{r, r}, false)
 	require.NoError(t, err)
-	assert.Equal(t, `[{"jsonrpc":"2.0","result":{"name":"john"},"id":"test"},{"jsonrpc":"2.0","result":{"name":"john"},"id":"test"}]
+	assert.Equal(t,
+		`[{"jsonrpc":"2.0","result":{"name":"john"},"id":"test"},{"jsonrpc":"2.0","result":{"name":"john"},"id":"test"}]
 `, rec.Body.String())
 }

@@ -16,7 +16,7 @@ func TestUnmarshal(t *testing.T) {
 
 	src := json.RawMessage([]byte(`{"name":"john"}`))
 
-	_ = Unmarshal(&src, nil)
+	err = Unmarshal(&src, nil)
 	require.IsType(t, &Error{}, err)
 	assert.Equal(t, ErrorCodeInvalidParams, err.Code)
 
