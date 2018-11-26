@@ -69,7 +69,7 @@ func (h EchoHandler) ServeJSONRPC(c context.Context, params *fastjson.RawMessage
 func (h PositionalHandler) ServeJSONRPC(c context.Context, params *fastjson.RawMessage) (interface{}, *Error) {
 
 	var p PositionalParams
-	if err := Unmarshal(params, &p); err != nil {
+	if err := jsonrpc.Unmarshal(params, &p); err != nil {
 		return nil, err
 	}
 
