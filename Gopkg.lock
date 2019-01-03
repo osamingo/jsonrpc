@@ -3,40 +3,55 @@
 
 [[projects]]
   branch = "master"
+  digest = "1:d7ef16bec6d1e5ecf8203a168e1e7eca3ee6a14594188f68cfeb8630929169d3"
   name = "github.com/alecthomas/jsonschema"
   packages = ["."]
+  pruneopts = ""
   revision = "f2c93856175a7dd6abe88c5c3900b67ad054adcc"
 
 [[projects]]
+  digest = "1:56c130d885a4aacae1dd9c7b71cfe39912c7ebc1ff7d2b46083c8812996dc43b"
   name = "github.com/davecgh/go-spew"
   packages = ["spew"]
+  pruneopts = ""
   revision = "346938d642f2ec3594ed81d874461961cd0faa76"
   version = "v1.1.0"
 
 [[projects]]
   branch = "master"
+  digest = "1:d069b20ee0f9a912a92f355377df3780c92530afffe6ba843ddd87869b3973f8"
   name = "github.com/intel-go/fastjson"
   packages = ["."]
+  pruneopts = ""
   revision = "f846ae58a1ab4a99d9480ce565601aebd84e333a"
 
 [[projects]]
+  digest = "1:256484dbbcd271f9ecebc6795b2df8cad4c458dd0f5fd82a8c2fa0c29f233411"
   name = "github.com/pmezard/go-difflib"
   packages = ["difflib"]
+  pruneopts = ""
   revision = "792786c7400a136282c1664665ae0a8db921c6c2"
   version = "v1.0.0"
 
 [[projects]]
+  digest = "1:a30066593578732a356dc7e5d7f78d69184ca65aeeff5939241a3ab10559bb06"
   name = "github.com/stretchr/testify"
   packages = [
     "assert",
-    "require"
+    "require",
   ]
+  pruneopts = ""
   revision = "12b6f73e6084dad08a7c6e575284b177ecafbc71"
   version = "v1.2.1"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "26a1a3d4114c9e735859cfba1bd446dc1c96954218fbe4a7be78d1c4b4493b5a"
+  input-imports = [
+    "github.com/alecthomas/jsonschema",
+    "github.com/intel-go/fastjson",
+    "github.com/stretchr/testify/assert",
+    "github.com/stretchr/testify/require",
+  ]
   solver-name = "gps-cdcl"
   solver-version = 1
