@@ -2,6 +2,7 @@ package jsonrpc
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 
 	"github.com/intel-go/fastjson"
@@ -24,6 +25,7 @@ func (mr *MethodRepository) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			},
 		}, false)
 		if err != nil {
+			fmt.Fprint(w, "Failed to encode error objects")
 			w.WriteHeader(http.StatusInternalServerError)
 		}
 		return
@@ -35,6 +37,7 @@ func (mr *MethodRepository) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := SendResponse(w, resp, batch); err != nil {
+		fmt.Fprint(w, "Failed to encode result objects")
 		w.WriteHeader(http.StatusInternalServerError)
 	}
 }
