@@ -4,24 +4,19 @@ language: go
 go:
   - 1.11.x
   - 1.12.x
-  - tip
-
-matrix:
-  allow_failures:
-  - go: tip
+  - 1.13.x
 
 before_install:
-  - go get -u github.com/golang/dep/cmd/dep github.com/golangci/golangci-lint/cmd/golangci-lint
+  - curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | sh -s -- -b $(go env GOPATH)/bin v1.18.0
 
 install:
-  - dep ensure
+  - GO111MODULE=on go mod vendor
 
 before_script:
-  - golangci-lint run
+  - golangci-lint run ./...
 
 script:
-  - go test -covermode=atomic -coverprofile=coverage.txt
+  - go test -covermode=atomic -coverprofile=coverage.txt ./...
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
-
