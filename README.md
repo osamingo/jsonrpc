@@ -1,6 +1,6 @@
 # jsonrpc
 
-[![GitHub Actions](https://github.com/osamingo/jsonrpc/workflows/CI/badge.svg?branch=master)
+[![GitHub Actions](https://github.com/osamingo/jsonrpc/workflows/CI/badge.svg?branch=master)](https://github.com/osamingo/jsonrpc/actions?query=workflow%3ACI+branch%3Amaster)
 [![codecov](https://codecov.io/gh/osamingo/jsonrpc/branch/master/graph/badge.svg)](https://codecov.io/gh/osamingo/jsonrpc)
 [![Go Report Card](https://goreportcard.com/badge/osamingo/jsonrpc)](https://goreportcard.com/report/osamingo/jsonrpc)
 [![codebeat badge](https://codebeat.co/badges/cbd0290d-200b-4693-80dc-296d9447c35b)](https://codebeat.co/projects/github-com-osamingo-jsonrpc)
