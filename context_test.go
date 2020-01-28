@@ -19,3 +19,15 @@ func TestRequestID(t *testing.T) {
 	})
 	require.Equal(t, &id, pick)
 }
+
+func TestMethodName(t *testing.T) {
+
+	c := context.Background()
+	mn := "FooService.Bar"
+	c = WithMethodName(c, mn)
+	var pick string
+	require.NotPanics(t, func() {
+		pick = MethodName(c)
+	})
+	require.Equal(t, mn, pick)
+}
