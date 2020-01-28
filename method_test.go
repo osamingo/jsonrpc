@@ -62,10 +62,9 @@ func TestMethods(t *testing.T) {
 }
 
 func SampleHandler() Handler {
-	h := handler{}
-	h.F = func(c context.Context, params *fastjson.RawMessage) (result interface{}, err *Error) {
+	h := HandlerFunc(func(c context.Context, params *fastjson.RawMessage) (result interface{}, err *Error) {
 		return nil, nil
-	}
+	})
 	return &h
 }
 
