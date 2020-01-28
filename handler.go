@@ -50,7 +50,7 @@ func (mr *MethodRepository) InvokeMethod(c context.Context, r *Request) *Respons
 	if res.Error != nil {
 		return res
 	}
-	res.Result, res.Error = h.ServeJSONRPC(WithRequestID(c, r.ID), r.Params)
+	res.Result, res.Error = h.ServeJSONRPC(WithMethodName(WithRequestID(c, r.ID), r.Method), r.Params)
 	if res.Error != nil {
 		res.Result = nil
 	}
