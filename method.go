@@ -27,20 +27,20 @@ func NewMethodRepository() *MethodRepository {
 	}
 }
 
-// TakeMethod takes jsonrpc.Func in MethodRepository.
-func (mr *MethodRepository) TakeMethod(r *Request) (Handler, *Error) {
+// TakeMethodMetadata takes metadata in MethodRepository for request.
+func (mr *MethodRepository) TakeMethodMetadata(r *Request) (Metadata, *Error) {
 	if r.Method == "" || r.Version != Version {
-		return nil, ErrInvalidParams()
+		return Metadata{}, ErrInvalidParams()
 	}
 
 	mr.m.RLock()
 	md, ok := mr.r[r.Method]
 	mr.m.RUnlock()
 	if !ok {
-		return nil, ErrMethodNotFound()
+		return Metadata{}, ErrMethodNotFound()
 	}
 
-	return md.Handler, nil
+	return md, nil
 }
 
 // RegisterMethod registers jsonrpc.Func to MethodRepository.
