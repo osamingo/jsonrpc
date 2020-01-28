@@ -13,6 +13,17 @@ type Handler interface {
 	ServeJSONRPC(c context.Context, params *fastjson.RawMessage) (result interface{}, err *Error)
 }
 
+// HandlerFunc type is an adapter to allow the use of
+// ordinary functions as JSONRPC handlers. If f is a function
+// with the appropriate signature, HandlerFunc(f) is a
+// jsonrpc.Handler that calls f.
+type HandlerFunc func(c context.Context, params *fastjson.RawMessage) (result interface{}, err *Error)
+
+// ServeJSONRPC calls f(w, r).
+func (f HandlerFunc) ServeJSONRPC(c context.Context, params *fastjson.RawMessage) (result interface{}, err *Error) {
+	return f(c, params)
+}
+
 // ServeHTTP provides basic JSON-RPC handling.
 func (mr *MethodRepository) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
@@ -51,7 +62,7 @@ func (mr *MethodRepository) InvokeMethod(c context.Context, r *Request) *Respons
 		return res
 	}
 
-	wrappedContext := WithMetadata(WithRequestID(c, r.ID), md)
+	wrappedContext := WithMethodName(WithMetadata(WithRequestID(c, r.ID), md), r.Method)
 	res.Result, res.Error = md.Handler.ServeJSONRPC(wrappedContext, r.Params)
 	if res.Error != nil {
 		res.Result = nil

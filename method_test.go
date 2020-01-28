@@ -9,30 +9,30 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestTakeMethod(t *testing.T) {
+func TestTakeMethodMetadata(t *testing.T) {
 
 	mr := NewMethodRepository()
 
 	r := &Request{}
-	_, err := mr.TakeMethod(r)
+	_, err := mr.TakeMethodMetadata(r)
 	require.IsType(t, &Error{}, err)
 	assert.Equal(t, ErrorCodeInvalidParams, err.Code)
 
 	r.Method = "test"
-	_, err = mr.TakeMethod(r)
+	_, err = mr.TakeMethodMetadata(r)
 	require.IsType(t, &Error{}, err)
 	assert.Equal(t, ErrorCodeInvalidParams, err.Code)
 
 	r.Version = "2.0"
-	_, err = mr.TakeMethod(r)
+	_, err = mr.TakeMethodMetadata(r)
 	require.IsType(t, &Error{}, err)
 	assert.Equal(t, ErrorCodeMethodNotFound, err.Code)
 
 	require.NoError(t, mr.RegisterMethod("test", SampleHandler(), nil, nil))
 
-	f, err := mr.TakeMethod(r)
+	md, err := mr.TakeMethodMetadata(r)
 	require.Nil(t, err)
-	assert.NotEmpty(t, f)
+	assert.NotEmpty(t, md)
 }
 
 func TestRegisterMethod(t *testing.T) {
@@ -67,4 +67,21 @@ func SampleHandler() Handler {
 		return nil, nil
 	}
 	return &h
+}
+
+type ExampleParam struct {
+}
+
+func TestMetadataInContext(t *testing.T) {
+
+	mr := NewMethodRepository()
+
+	err := mr.RegisterMethod(t.Name(), SampleHandler(), ExampleParam{}, nil)
+	require.NoError(t, err)
+
+	r := &Request{Method: t.Name(), Version: "2.0"}
+	md, err := mr.TakeMethodMetadata(r)
+	require.Nil(t, err)
+	assert.Equal(t, ExampleParam{}, md.Params)
+
 }
