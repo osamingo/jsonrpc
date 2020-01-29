@@ -20,12 +20,12 @@ func WithRequestID(c context.Context, id *fastjson.RawMessage) context.Context {
 	return context.WithValue(c, requestIDKey{}, id)
 }
 
-// RequestID takes request id from context.
+// GetMetadata takes jsonrpc metadata from context.
 func GetMetadata(c context.Context) Metadata {
 	return c.Value(metadataIDKey{}).(Metadata)
 }
 
-// WithRequestID adds request id to context.
+// WithMetadata adds jsonrpc metadata to context.
 func WithMetadata(c context.Context, md Metadata) context.Context {
 	return context.WithValue(c, metadataIDKey{}, md)
 }
