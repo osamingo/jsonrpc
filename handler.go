@@ -44,16 +44,17 @@ func (mr *MethodRepository) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 // InvokeMethod invokes JSON-RPC method.
 func (mr *MethodRepository) InvokeMethod(c context.Context, r *Request) *Response {
-	var h Handler
+	var md Metadata
 	res := NewResponse(r)
-	h, res.Error = mr.TakeMethod(r)
+	md, res.Error = mr.TakeMethodMetadata(r)
 	if res.Error != nil {
 		return res
 	}
 
 	wrappedContext := WithRequestID(c, r.ID)
 	wrappedContext = WithMethodName(wrappedContext, r.Method)
-	res.Result, res.Error = h.ServeJSONRPC(wrappedContext, r.Params)
+	wrappedContext = WithMetadata(wrappedContext, md)
+	res.Result, res.Error = md.Handler.ServeJSONRPC(wrappedContext, r.Params)
 	if res.Error != nil {
 		res.Result = nil
 	}

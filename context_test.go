@@ -20,6 +20,18 @@ func TestRequestID(t *testing.T) {
 	require.Equal(t, &id, pick)
 }
 
+func TestMetadata(t *testing.T) {
+
+	c := context.Background()
+	md := Metadata{Params: Metadata{}}
+	c = WithMetadata(c, md)
+	var pick Metadata
+	require.NotPanics(t, func() {
+		pick = GetMetadata(c)
+	})
+	require.Equal(t, md, pick)
+}
+
 func TestMethodName(t *testing.T) {
 
 	c := context.Background()
