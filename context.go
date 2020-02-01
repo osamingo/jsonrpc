@@ -7,8 +7,8 @@ import (
 )
 
 type requestIDKey struct{}
-type metadataIDKey struct{}
 type methodNameKey struct{}
+type metadataIDKey struct{}
 
 // RequestID takes request id from context.
 func RequestID(c context.Context) *fastjson.RawMessage {
