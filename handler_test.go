@@ -12,14 +12,6 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-type handler struct {
-	F func(c context.Context, params *fastjson.RawMessage) (interface{}, *Error)
-}
-
-func (h *handler) ServeJSONRPC(c context.Context, params *fastjson.RawMessage) (interface{}, *Error) {
-	return h.F(c, params)
-}
-
 func TestHandler(t *testing.T) {
 
 	mr := NewMethodRepository()
@@ -46,15 +38,13 @@ func TestHandler(t *testing.T) {
 	require.NoError(t, err)
 	assert.NotNil(t, res.Error)
 
-	h1 := &handler{}
-	h1.F = func(c context.Context, params *fastjson.RawMessage) (interface{}, *Error) {
+	h1 := HandlerFunc(func(c context.Context, params *fastjson.RawMessage) (interface{}, *Error) {
 		return "hello", nil
-	}
+	})
 	require.NoError(t, mr.RegisterMethod("hello", h1, nil, nil))
-	h2 := &handler{}
-	h2.F = func(c context.Context, params *fastjson.RawMessage) (interface{}, *Error) {
+	h2 := HandlerFunc(func(c context.Context, params *fastjson.RawMessage) (interface{}, *Error) {
 		return nil, ErrInternal()
-	}
+	})
 	require.NoError(t, mr.RegisterMethod("bye", h2, nil, nil))
 
 	rec = httptest.NewRecorder()
