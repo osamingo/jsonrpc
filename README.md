@@ -21,7 +21,7 @@ Note: If you use Go 1.6, see [v1.0](https://github.com/osamingo/jsonrpc/releases
 ## Install
 
 ```
-$ go get -u github.com/osamingo/jsonrpc
+$ go get -u github.com/osamingo/jsonrpc/v2
 ```
 
 ## Usage
@@ -35,7 +35,7 @@ import (
 	"net/http"
 
 	"github.com/intel-go/fastjson"
-	"github.com/osamingo/jsonrpc"
+	"github.com/osamingo/jsonrpc/v2"
 )
 
 type (
@@ -108,7 +108,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/osamingo/jsonrpc"
+	"github.com/osamingo/jsonrpc/v2"
 )
 
 type (
