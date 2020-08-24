@@ -1,4 +1,4 @@
-module github.com/osamingo/jsonrpc/v2
+module github.com/alexus1024/jsonrpc/v2
 
 go 1.13
 
