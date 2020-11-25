@@ -5,22 +5,22 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/intel-go/fastjson"
+	"github.com/goccy/go-json"
 )
 
 // Handler links a method of JSON-RPC request.
 type Handler interface {
-	ServeJSONRPC(c context.Context, params *fastjson.RawMessage) (result interface{}, err *Error)
+	ServeJSONRPC(c context.Context, params *json.RawMessage) (result interface{}, err *Error)
 }
 
 // HandlerFunc type is an adapter to allow the use of
 // ordinary functions as JSONRPC handlers. If f is a function
 // with the appropriate signature, HandlerFunc(f) is a
 // jsonrpc.Handler that calls f.
-type HandlerFunc func(c context.Context, params *fastjson.RawMessage) (result interface{}, err *Error)
+type HandlerFunc func(c context.Context, params *json.RawMessage) (result interface{}, err *Error)
 
 // ServeJSONRPC calls f(w, r).
-func (f HandlerFunc) ServeJSONRPC(c context.Context, params *fastjson.RawMessage) (result interface{}, err *Error) {
+func (f HandlerFunc) ServeJSONRPC(c context.Context, params *json.RawMessage) (result interface{}, err *Error) {
 	return f(c, params)
 }
 
