@@ -5,7 +5,7 @@ import (
 	"reflect"
 
 	"github.com/alecthomas/jsonschema"
-	"github.com/intel-go/fastjson"
+	"github.com/goccy/go-json"
 )
 
 // A MethodReference is a reference of JSON-RPC method.
@@ -28,7 +28,7 @@ func (mr *MethodRepository) ServeDebug(w http.ResponseWriter, r *http.Request) {
 		l = append(l, makeMethodReference(k, md))
 	}
 	w.Header().Set(contentTypeKey, contentTypeValue)
-	if err := fastjson.NewEncoder(w).Encode(l); err != nil {
+	if err := json.NewEncoder(w).Encode(l); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
