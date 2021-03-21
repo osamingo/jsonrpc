@@ -9,7 +9,6 @@ import (
 )
 
 func TestUnmarshal(t *testing.T) {
-
 	err := Unmarshal(nil, nil)
 	require.IsType(t, &Error{}, err)
 	assert.Equal(t, ErrorCodeInvalidParams, err.Code)

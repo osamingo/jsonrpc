@@ -12,7 +12,6 @@ import (
 )
 
 func TestParseRequest(t *testing.T) {
-
 	r, rerr := http.NewRequest("", "", bytes.NewReader(nil))
 	require.NoError(t, rerr)
 
@@ -87,7 +86,6 @@ func TestNewResponse(t *testing.T) {
 }
 
 func TestSendResponse(t *testing.T) {
-
 	rec := httptest.NewRecorder()
 	err := SendResponse(rec, []*Response{}, false)
 	require.NoError(t, err)

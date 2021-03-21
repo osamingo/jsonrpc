@@ -13,7 +13,6 @@ import (
 )
 
 func TestHandler(t *testing.T) {
-
 	mr := NewMethodRepository()
 
 	rec := httptest.NewRecorder()

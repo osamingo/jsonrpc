@@ -10,7 +10,6 @@ import (
 )
 
 func TestTakeMethod(t *testing.T) {
-
 	mr := NewMethodRepository()
 
 	r := &Request{}
@@ -36,7 +35,6 @@ func TestTakeMethod(t *testing.T) {
 }
 
 func TestRegisterMethod(t *testing.T) {
-
 	mr := NewMethodRepository()
 
 	err := mr.RegisterMethod("", nil, nil, nil)
@@ -50,7 +48,6 @@ func TestRegisterMethod(t *testing.T) {
 }
 
 func TestMethods(t *testing.T) {
-
 	mr := NewMethodRepository()
 
 	err := mr.RegisterMethod("JsonRpc.Sample", SampleHandler(), nil, nil)
@@ -62,7 +59,6 @@ func TestMethods(t *testing.T) {
 }
 
 func SampleHandler() Handler {
-
 	h := HandlerFunc(func(c context.Context, params *json.RawMessage) (result interface{}, err *Error) {
 		return nil, nil
 	})

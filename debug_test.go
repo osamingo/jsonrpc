@@ -10,7 +10,6 @@ import (
 )
 
 func TestDebugHandler(t *testing.T) {
-
 	t.Skip()
 
 	mr := NewMethodRepository()

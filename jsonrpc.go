@@ -37,7 +37,6 @@ type (
 
 // ParseRequest parses a HTTP request to JSON-RPC request.
 func ParseRequest(r *http.Request) ([]*Request, bool, *Error) {
-
 	var rerr *Error
 
 	if !strings.HasPrefix(r.Header.Get(contentTypeKey), contentTypeValue) {

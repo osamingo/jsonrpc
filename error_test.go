@@ -14,7 +14,6 @@ func TestError(t *testing.T) {
 }
 
 func TestError_Error(t *testing.T) {
-
 	err := &Error{
 		Code:    ErrorCode(100),
 		Message: "test",
