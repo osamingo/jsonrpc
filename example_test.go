@@ -29,7 +29,6 @@ type (
 )
 
 func (h EchoHandler) ServeJSONRPC(c context.Context, params *json.RawMessage) (interface{}, *Error) {
-
 	var p EchoParams
 	if err := Unmarshal(params, &p); err != nil {
 		return nil, err
@@ -41,7 +40,6 @@ func (h EchoHandler) ServeJSONRPC(c context.Context, params *json.RawMessage) (i
 }
 
 func (h PositionalHandler) ServeJSONRPC(c context.Context, params *json.RawMessage) (interface{}, *Error) {
-
 	var p PositionalParams
 	if err := Unmarshal(params, &p); err != nil {
 		return nil, err
@@ -53,7 +51,6 @@ func (h PositionalHandler) ServeJSONRPC(c context.Context, params *json.RawMessa
 }
 
 func ExampleEchoHandler_ServeJSONRPC() {
-
 	mr := NewMethodRepository()
 
 	if err := mr.RegisterMethod("Main.Echo", EchoHandler{}, EchoParams{}, EchoResult{}); err != nil {

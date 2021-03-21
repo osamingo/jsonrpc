@@ -29,7 +29,6 @@ func NewMethodRepository() *MethodRepository {
 
 // TakeMethodMetadata takes metadata in MethodRepository for request.
 func (mr *MethodRepository) TakeMethodMetadata(r *Request) (Metadata, *Error) {
-
 	if r.Method == "" || r.Version != Version {
 		return Metadata{}, ErrInvalidParams()
 	}

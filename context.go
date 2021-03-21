@@ -6,9 +6,11 @@ import (
 	"github.com/goccy/go-json"
 )
 
-type requestIDKey struct{}
-type metadataIDKey struct{}
-type methodNameKey struct{}
+type (
+	requestIDKey  struct{}
+	metadataIDKey struct{}
+	methodNameKey struct{}
+)
 
 // RequestID takes request id from context.
 func RequestID(c context.Context) *json.RawMessage {

@@ -9,7 +9,6 @@ import (
 )
 
 func TestRequestID(t *testing.T) {
-
 	c := context.Background()
 	id := json.RawMessage("1")
 	c = WithRequestID(c, &id)
@@ -21,7 +20,6 @@ func TestRequestID(t *testing.T) {
 }
 
 func TestMetadata(t *testing.T) {
-
 	c := context.Background()
 	md := Metadata{Params: Metadata{}}
 	c = WithMetadata(c, md)
@@ -33,7 +31,6 @@ func TestMetadata(t *testing.T) {
 }
 
 func TestMethodName(t *testing.T) {
-
 	c := context.Background()
 	c = WithMethodName(c, t.Name())
 	var pick string

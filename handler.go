@@ -26,7 +26,6 @@ func (f HandlerFunc) ServeJSONRPC(c context.Context, params *json.RawMessage) (r
 
 // ServeHTTP provides basic JSON-RPC handling.
 func (mr *MethodRepository) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-
 	rs, batch, err := ParseRequest(r)
 	if err != nil {
 		err := SendResponse(w, []*Response{
