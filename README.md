@@ -11,12 +11,7 @@
 ## About
 
 - Simple, Poetic, Pithy.
-- No `reflect` package.
-  - But `reflect` package is used only when invoke the debug handler.
-- Support GAE/Go Standard Environment.
 - Compliance with [JSON-RPC 2.0](http://www.jsonrpc.org/specification).
-
-Note: If you use Go 1.6, see [v1.0](https://github.com/osamingo/jsonrpc/releases/tag/v1.0).
 
 ## Install
 
