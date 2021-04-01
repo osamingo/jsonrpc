@@ -60,7 +60,7 @@ func GetRequest(c context.Context) *http.Request {
 	return nil
 }
 
-// WithRequest adds response to context.
+// WithResponse adds response to context.
 func WithResponse(c context.Context, r http.ResponseWriter) context.Context {
 	return context.WithValue(c, responseKey{}, r)
 }
