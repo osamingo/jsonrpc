@@ -2,9 +2,12 @@ package jsonrpc
 
 import (
 	"context"
+	"net/http"
+	"net/http/httptest"
 	"testing"
 
 	"github.com/goccy/go-json"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -38,4 +41,26 @@ func TestMethodName(t *testing.T) {
 		pick = MethodName(c)
 	})
 	require.Equal(t, t.Name(), pick)
+}
+
+func TestRequest(t *testing.T) {
+	assert.NotPanics(t, func() {
+		r := GetRequest(context.Background())
+		assert.Nil(t, r)
+	})
+	c := context.Background()
+	r := httptest.NewRequest(http.MethodPost, "/", nil)
+	c = WithRequest(c, r)
+	assert.Equal(t, r, GetRequest(c))
+}
+
+func TestResponse(t *testing.T) {
+	assert.NotPanics(t, func() {
+		r := GetResponse(context.Background())
+		assert.Nil(t, r)
+	})
+	c := context.Background()
+	r := httptest.NewRecorder()
+	c = WithResponse(c, r)
+	assert.Equal(t, r, GetResponse(c))
 }
