@@ -87,7 +87,7 @@ func TestInvokeMethodMiddlewares(t *testing.T) {
 		require.NotNil(t, v)
 		v = c.Value("key2")
 		require.NotNil(t, v)
-		return nil, nil
+		return "value3", nil
 	}), nil, nil, func(next HandlerFunc) HandlerFunc {
 		return func(c context.Context, params *json.RawMessage) (result interface{}, err *Error) {
 			c = context.WithValue(c, "key1", "value1")
