@@ -60,9 +60,10 @@ func (mr *MethodRepository) RegisterMethod(method string, h Handler, params, res
 	}
 	mr.m.Lock()
 	mr.r[method] = Metadata{
-		Handler: h,
-		Params:  params,
-		Result:  result,
+		Handler:     h,
+		Params:      params,
+		Result:      result,
+		Middlewares: middlewares,
 	}
 	mr.m.Unlock()
 	return nil
