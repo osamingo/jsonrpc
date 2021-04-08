@@ -45,6 +45,14 @@ func TestRegisterMethod(t *testing.T) {
 
 	err = mr.RegisterMethod("test", SampleHandler(), nil, nil)
 	require.NoError(t, err)
+
+	err = mr.RegisterMethod("test", SampleHandler(), nil, nil, nil)
+	require.NoError(t, err)
+	assert.Len(t, mr.r["test"].Middlewares, 1)
+
+	err = mr.RegisterMethod("test", SampleHandler(), nil, nil, nil, nil)
+	require.NoError(t, err)
+	assert.Len(t, mr.r["test"].Middlewares, 2)
 }
 
 func TestMethods(t *testing.T) {

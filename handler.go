@@ -19,6 +19,9 @@ type Handler interface {
 // jsonrpc.Handler that calls f.
 type HandlerFunc func(c context.Context, params *json.RawMessage) (result interface{}, err *Error)
 
+// MiddlewareFunc defines a function to process middleware.
+type MiddlewareFunc func(HandlerFunc) HandlerFunc
+
 // ServeJSONRPC calls f(w, r).
 func (f HandlerFunc) ServeJSONRPC(c context.Context, params *json.RawMessage) (result interface{}, err *Error) {
 	return f(c, params)
