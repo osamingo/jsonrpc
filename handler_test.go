@@ -69,3 +69,41 @@ func TestHandler(t *testing.T) {
 	require.NoError(t, err)
 	assert.NotNil(t, res.Error)
 }
+
+func TestInvokeMethodMiddlewares(t *testing.T) {
+	rec := httptest.NewRecorder()
+	req := httptest.NewRequest(http.MethodPost, "/", nil)
+	ctx := context.Background()
+	id := json.RawMessage("test")
+	r := &Request{
+		Version: "2.0",
+		Method:  "test",
+		ID:      &id,
+	}
+
+	mr := NewMethodRepository()
+	err := mr.RegisterMethod("test", HandlerFunc(func(c context.Context, params *json.RawMessage) (result interface{}, err *Error) {
+		v := c.Value("key1")
+		require.NotNil(t, v)
+		v = c.Value("key2")
+		require.NotNil(t, v)
+		return nil, nil
+	}), nil, nil, func(next HandlerFunc) HandlerFunc {
+		return func(c context.Context, params *json.RawMessage) (result interface{}, err *Error) {
+			c = context.WithValue(c, "key1", "value1")
+			return next(c, params)
+		}
+	}, func(next HandlerFunc) HandlerFunc {
+		return func(c context.Context, params *json.RawMessage) (result interface{}, err *Error) {
+			v := c.Value("key1")
+			require.NotNil(t, v)
+			c = context.WithValue(c, "key2", "value2")
+			return next(c, params)
+		}
+	})
+	require.NoError(t, err)
+
+	resp := mr.InvokeMethod(ctx, r, req, rec)
+	require.Nil(t, resp.Error)
+	require.NotNil(t, resp.Result)
+}
