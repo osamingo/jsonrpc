@@ -19,6 +19,9 @@ type Handler interface {
 // jsonrpc.Handler that calls f.
 type HandlerFunc func(c context.Context, params *json.RawMessage) (result interface{}, err *Error)
 
+// MiddlewareFunc defines a function to process middleware.
+type MiddlewareFunc func(HandlerFunc) HandlerFunc
+
 // ServeJSONRPC calls f(w, r).
 func (f HandlerFunc) ServeJSONRPC(c context.Context, params *json.RawMessage) (result interface{}, err *Error) {
 	return f(c, params)
@@ -43,7 +46,7 @@ func (mr *MethodRepository) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	resp := make([]*Response, len(rs))
 	for i := range rs {
-		resp[i] = mr.InvokeMethod(r.Context(), rs[i])
+		resp[i] = mr.InvokeMethod(r.Context(), rs[i], r, w)
 	}
 
 	if err := SendResponse(w, resp, batch); err != nil {
@@ -52,8 +55,15 @@ func (mr *MethodRepository) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func applyMiddleware(h Handler, middleware ...MiddlewareFunc) Handler {
+	for i := len(middleware) - 1; i >= 0; i-- {
+		h = middleware[i](h.ServeJSONRPC)
+	}
+	return h
+}
+
 // InvokeMethod invokes JSON-RPC method.
-func (mr *MethodRepository) InvokeMethod(c context.Context, r *Request) *Response {
+func (mr *MethodRepository) InvokeMethod(c context.Context, r *Request, req *http.Request, w http.ResponseWriter) *Response {
 	var md Metadata
 	res := NewResponse(r)
 	md, res.Error = mr.TakeMethodMetadata(r)
@@ -64,7 +74,10 @@ func (mr *MethodRepository) InvokeMethod(c context.Context, r *Request) *Respons
 	wrappedContext := WithRequestID(c, r.ID)
 	wrappedContext = WithMethodName(wrappedContext, r.Method)
 	wrappedContext = WithMetadata(wrappedContext, md)
-	res.Result, res.Error = md.Handler.ServeJSONRPC(wrappedContext, r.Params)
+	wrappedContext = WithRequest(wrappedContext, req)
+	wrappedContext = WithResponse(wrappedContext, w)
+	handler := applyMiddleware(md.Handler, md.Middlewares...)
+	res.Result, res.Error = handler.ServeJSONRPC(wrappedContext, r.Params)
 	if res.Error != nil {
 		res.Result = nil
 	}
