@@ -8,8 +8,9 @@ import (
 type (
 	// A MethodRepository has JSON-RPC method functions.
 	MethodRepository struct {
-		m sync.RWMutex
-		r map[string]Metadata
+		middlewares []MiddlewareFunc
+		m           sync.RWMutex
+		r           map[string]Metadata
 	}
 	// Metadata has method meta data.
 	Metadata struct {
