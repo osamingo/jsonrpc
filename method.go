@@ -59,12 +59,17 @@ func (mr *MethodRepository) RegisterMethod(method string, h Handler, params, res
 	if method == "" || h == nil {
 		return errors.New("jsonrpc: method name and function should not be empty")
 	}
+
+	m := make([]MiddlewareFunc, 0, len(mr.middlewares)+len(middlewares))
+	m = append(m, mr.middlewares...)
+	m = append(m, middlewares...)
+
 	mr.m.Lock()
 	mr.r[method] = Metadata{
 		Handler:     h,
 		Params:      params,
 		Result:      result,
-		Middlewares: middlewares,
+		Middlewares: m,
 	}
 	mr.m.Unlock()
 	return nil
