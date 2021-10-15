@@ -2,7 +2,6 @@ package jsonrpc
 
 import (
 	"context"
-	"net/http"
 
 	"github.com/goccy/go-json"
 )
@@ -11,8 +10,6 @@ type (
 	requestIDKey  struct{}
 	metadataIDKey struct{}
 	methodNameKey struct{}
-	requestKey    struct{}
-	responseKey   struct{}
 )
 
 // RequestID takes request id from context.
@@ -43,34 +40,4 @@ func MethodName(c context.Context) string {
 // WithMethodName adds method name to context.
 func WithMethodName(c context.Context, name string) context.Context {
 	return context.WithValue(c, methodNameKey{}, name)
-}
-
-// WithRequest adds request to context.
-func WithRequest(c context.Context, r *http.Request) context.Context {
-	return context.WithValue(c, requestKey{}, r)
-}
-
-// GetRequest takes request from context.
-func GetRequest(c context.Context) *http.Request {
-	v := c.Value(requestKey{})
-	if r, ok := v.(*http.Request); ok {
-		return r
-	}
-
-	return nil
-}
-
-// WithResponse adds response to context.
-func WithResponse(c context.Context, r http.ResponseWriter) context.Context {
-	return context.WithValue(c, responseKey{}, r)
-}
-
-// GetResponse takes response from context.
-func GetResponse(c context.Context) http.ResponseWriter {
-	v := c.Value(responseKey{})
-	if r, ok := v.(http.ResponseWriter); ok {
-		return r
-	}
-
-	return nil
 }

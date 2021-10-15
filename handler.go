@@ -67,8 +67,6 @@ func (mr *MethodRepository) InvokeMethod(c context.Context, r *Request, req *htt
 	wrappedContext := WithRequestID(c, r.ID)
 	wrappedContext = WithMethodName(wrappedContext, r.Method)
 	wrappedContext = WithMetadata(wrappedContext, md)
-	wrappedContext = WithRequest(wrappedContext, req)
-	wrappedContext = WithResponse(wrappedContext, w)
 	handler := applyMiddleware(md.Handler, md.Middlewares...)
 	res.Result, res.Error = handler.ServeJSONRPC(wrappedContext, r.Params)
 	if res.Error != nil {
