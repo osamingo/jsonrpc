@@ -46,7 +46,7 @@ func (mr *MethodRepository) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	resp := make([]*Response, len(rs))
 	for i := range rs {
-		resp[i] = mr.InvokeMethod(r.Context(), rs[i], r, w)
+		resp[i] = mr.InvokeMethod(r.Context(), rs[i])
 	}
 
 	if err := SendResponse(w, resp, batch); err != nil {
@@ -56,7 +56,7 @@ func (mr *MethodRepository) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 // InvokeMethod invokes JSON-RPC method.
-func (mr *MethodRepository) InvokeMethod(c context.Context, r *Request, req *http.Request, w http.ResponseWriter) *Response {
+func (mr *MethodRepository) InvokeMethod(c context.Context, r *Request) *Response {
 	var md Metadata
 	res := NewResponse(r)
 	md, res.Error = mr.TakeMethodMetadata(r)

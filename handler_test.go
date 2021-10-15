@@ -71,8 +71,6 @@ func TestHandler(t *testing.T) {
 }
 
 func TestInvokeMethodMiddlewares(t *testing.T) {
-	rec := httptest.NewRecorder()
-	req := httptest.NewRequest(http.MethodPost, "/", nil)
 	ctx := context.Background()
 	id := json.RawMessage("test")
 	r := &Request{
@@ -103,7 +101,7 @@ func TestInvokeMethodMiddlewares(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	resp := mr.InvokeMethod(ctx, r, req, rec)
+	resp := mr.InvokeMethod(ctx, r)
 	require.Nil(t, resp.Error)
 	require.NotNil(t, resp.Result)
 }

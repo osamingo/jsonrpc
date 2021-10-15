@@ -3,8 +3,6 @@ package jsonrpc
 import (
 	"bytes"
 	"context"
-	"net/http"
-	"net/http/httptest"
 	"testing"
 
 	"github.com/goccy/go-json"
@@ -36,8 +34,6 @@ func TestMiddlewareOrder(t *testing.T) {
 	mr.UseMiddleware(mw("-1"), mw("1"))
 	mr.UseMiddleware(mw("2"))
 
-	rec := httptest.NewRecorder()
-	req := httptest.NewRequest(http.MethodPost, "/", nil)
 	ctx := context.Background()
 	id := json.RawMessage("test")
 	r := &Request{
@@ -57,7 +53,7 @@ func TestMiddlewareOrder(t *testing.T) {
 	)
 	require.NoError(t, err)
 
-	resp := mr.InvokeMethod(ctx, r, req, rec)
+	resp := mr.InvokeMethod(ctx, r)
 	require.Nil(t, resp.Error)
 	assert.Equal(t, "-112345", buf.String())
 }
