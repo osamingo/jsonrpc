@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"reflect"
 
-	"github.com/alecthomas/jsonschema"
 	"github.com/goccy/go-json"
+	"github.com/invopop/jsonschema"
 )
 
 // A MethodReference is a reference of JSON-RPC method.
@@ -17,10 +17,11 @@ type MethodReference struct {
 }
 
 // ServeDebug views registered method list.
-func (mr *MethodRepository) ServeDebug(w http.ResponseWriter, r *http.Request) { // nolint: unparam
+func (mr *MethodRepository) ServeDebug(w http.ResponseWriter, r *http.Request) {
 	ms := mr.Methods()
 	if len(ms) == 0 {
 		w.WriteHeader(http.StatusNotFound)
+
 		return
 	}
 	l := make([]*MethodReference, 0, len(ms))
@@ -28,8 +29,9 @@ func (mr *MethodRepository) ServeDebug(w http.ResponseWriter, r *http.Request) {
 		l = append(l, makeMethodReference(k, md))
 	}
 	w.Header().Set(contentTypeKey, contentTypeValue)
-	if err := json.NewEncoder(w).Encode(l); err != nil {
+	if err := json.NewEncoder(w).EncodeContext(r.Context(), l); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
+
 		return
 	}
 }
@@ -49,5 +51,6 @@ func makeMethodReference(k string, md Metadata) *MethodReference {
 	if md.Result != nil {
 		mr.Result = jsonschema.Reflect(md.Result)
 	}
+
 	return mr
 }

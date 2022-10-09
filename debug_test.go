@@ -1,19 +1,23 @@
-package jsonrpc
+package jsonrpc_test
 
 import (
+	"context"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
+	"github.com/osamingo/jsonrpc/v2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
 func TestDebugHandler(t *testing.T) {
-	mr := NewMethodRepository()
+	t.Parallel()
+
+	mr := jsonrpc.NewMethodRepository()
 
 	rec := httptest.NewRecorder()
-	r, err := http.NewRequest("", "", nil)
+	r, err := http.NewRequestWithContext(context.Background(), "", "", nil)
 	require.NoError(t, err)
 
 	mr.ServeDebug(rec, r)
@@ -27,7 +31,7 @@ func TestDebugHandler(t *testing.T) {
 	}{}))
 
 	rec = httptest.NewRecorder()
-	r, err = http.NewRequest("", "", nil)
+	r, err = http.NewRequestWithContext(context.Background(), "", "", nil)
 	require.NoError(t, err)
 
 	mr.ServeDebug(rec, r)
