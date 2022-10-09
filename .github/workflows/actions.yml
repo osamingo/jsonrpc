@@ -11,32 +11,24 @@ on:
 jobs:
   lint:
     name: Lint
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     steps:
-      - name: Check out code
-        uses: actions/checkout@v2
-      - name: Download golangci-lint command
-        run: curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.21.0
-      - name: Lint Go Code
-        run: PATH=$PATH:$(go env GOPATH)/bin golangci-lint run ./...
+      - uses: actions/checkout@v3
+      - uses: golangci/golangci-lint-action@v3
+        with:
+          version: v1.49.0
   test:
     name: Test
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     strategy:
       matrix:
-        go: [ '1.15.x', '1.16.x' ]
+        go: [ '1.18.x', '1.19.x' ]
     steps:
-      - name: Set up Go
-        uses: actions/setup-go@v2
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v2
         with:
           go-version: ${{ matrix.go }}
-      - name: Check out code
-        uses: actions/checkout@v2
-      - name: Test Go Code
-        run: PATH=$PATH:$(go env GOPATH)/bin go test -covermode=atomic -coverprofile=coverage.txt ./...
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v1
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          file: coverage.txt
-          yml: codecov.yml
+      - run: go test -race -covermode=atomic -coverprofile=coverage.txt ./...
+        env:
+          KENALL_AUTHORIZATION_TOKEN: ${{ secrets.KENALL_AUTHORIZATION_TOKEN }}
+      - uses: codecov/codecov-action@v2

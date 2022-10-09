@@ -10,17 +10,17 @@ import (
 
 // Handler links a method of JSON-RPC request.
 type Handler interface {
-	ServeJSONRPC(c context.Context, params *json.RawMessage) (result interface{}, err *Error)
+	ServeJSONRPC(c context.Context, params *json.RawMessage) (result any, err *Error)
 }
 
 // HandlerFunc type is an adapter to allow the use of
 // ordinary functions as JSONRPC handlers. If f is a function
 // with the appropriate signature, HandlerFunc(f) is a
 // jsonrpc.Handler that calls f.
-type HandlerFunc func(c context.Context, params *json.RawMessage) (result interface{}, err *Error)
+type HandlerFunc func(c context.Context, params *json.RawMessage) (result any, err *Error)
 
 // ServeJSONRPC calls f(w, r).
-func (f HandlerFunc) ServeJSONRPC(c context.Context, params *json.RawMessage) (result interface{}, err *Error) {
+func (f HandlerFunc) ServeJSONRPC(c context.Context, params *json.RawMessage) (any, *Error) {
 	return f(c, params)
 }
 
@@ -28,6 +28,7 @@ func (f HandlerFunc) ServeJSONRPC(c context.Context, params *json.RawMessage) (r
 func (mr *MethodRepository) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	rs, batch, err := ParseRequest(r)
 	if err != nil {
+		//nolint: contextcheck
 		err := SendResponse(w, []*Response{
 			{
 				Version: Version,
@@ -38,6 +39,7 @@ func (mr *MethodRepository) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			fmt.Fprint(w, "Failed to encode error objects")
 			w.WriteHeader(http.StatusInternalServerError)
 		}
+
 		return
 	}
 
@@ -46,6 +48,7 @@ func (mr *MethodRepository) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		resp[i] = mr.InvokeMethod(r.Context(), rs[i])
 	}
 
+	//nolint: contextcheck
 	if err := SendResponse(w, resp, batch); err != nil {
 		fmt.Fprint(w, "Failed to encode result objects")
 		w.WriteHeader(http.StatusInternalServerError)
@@ -68,5 +71,6 @@ func (mr *MethodRepository) InvokeMethod(c context.Context, r *Request) *Respons
 	if res.Error != nil {
 		res.Result = nil
 	}
+
 	return res
 }

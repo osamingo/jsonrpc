@@ -2,6 +2,7 @@ package jsonrpc
 
 import (
 	"bytes"
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -29,7 +30,7 @@ type (
 	// A Response represents a JSON-RPC response returned by the server.
 	Response struct {
 		Version string           `json:"jsonrpc"`
-		Result  interface{}      `json:"result,omitempty"`
+		Result  any              `json:"result,omitempty"`
 		Error   *Error           `json:"error,omitempty"`
 		ID      *json.RawMessage `json:"id,omitempty"`
 	}
@@ -72,6 +73,7 @@ func ParseRequest(r *http.Request) ([]*Request, bool, *Error) {
 		if err := json.NewDecoder(buf).Decode(&req); err != nil {
 			return nil, false, ErrParse()
 		}
+
 		return append(rs, req), false, nil
 	}
 
@@ -94,9 +96,14 @@ func NewResponse(r *Request) *Response {
 func SendResponse(w http.ResponseWriter, resp []*Response, batch bool) error {
 	w.Header().Set(contentTypeKey, contentTypeValue)
 	if batch || len(resp) > 1 {
-		return json.NewEncoder(w).Encode(resp)
+		if err := json.NewEncoder(w).Encode(resp); err != nil {
+			return fmt.Errorf("jsonrpc: failed to encode: %w", err)
+		}
 	} else if len(resp) == 1 {
-		return json.NewEncoder(w).Encode(resp[0])
+		if err := json.NewEncoder(w).Encode(resp[0]); err != nil {
+			return fmt.Errorf("jsonrpc: failed to encode: %w", err)
+		}
 	}
+
 	return nil
 }

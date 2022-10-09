@@ -1,4 +1,4 @@
-package jsonrpc
+package jsonrpc_test
 
 import (
 	"bytes"
@@ -8,63 +8,66 @@ import (
 	"testing"
 
 	"github.com/goccy/go-json"
+	"github.com/osamingo/jsonrpc/v2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
 func TestHandler(t *testing.T) {
-	mr := NewMethodRepository()
+	t.Parallel()
+
+	mr := jsonrpc.NewMethodRepository()
 
 	rec := httptest.NewRecorder()
-	r, err := http.NewRequest("", "", nil)
+	r, err := http.NewRequestWithContext(context.Background(), "", "", nil)
 	require.NoError(t, err)
 
 	mr.ServeHTTP(rec, r)
 
-	res := Response{}
+	res := jsonrpc.Response{}
 	err = json.NewDecoder(rec.Body).Decode(&res)
 	require.NoError(t, err)
 	assert.NotNil(t, res.Error)
 
 	rec = httptest.NewRecorder()
-	r, err = http.NewRequest("", "", bytes.NewReader([]byte(`{"jsonrpc":"2.0","id":"test","method":"hello","params":{}}`)))
+	r, err = http.NewRequestWithContext(context.Background(), "", "", bytes.NewReader([]byte(`{"jsonrpc":"2.0","id":"test","method":"hello","params":{}}`)))
 	require.NoError(t, err)
 	r.Header.Set("Content-Type", "application/json")
 
 	mr.ServeHTTP(rec, r)
-	res = Response{}
+	res = jsonrpc.Response{}
 	err = json.NewDecoder(rec.Body).Decode(&res)
 	require.NoError(t, err)
 	assert.NotNil(t, res.Error)
 
-	h1 := HandlerFunc(func(c context.Context, params *json.RawMessage) (interface{}, *Error) {
+	h1 := jsonrpc.HandlerFunc(func(c context.Context, params *json.RawMessage) (any, *jsonrpc.Error) {
 		return "hello", nil
 	})
 	require.NoError(t, mr.RegisterMethod("hello", h1, nil, nil))
-	h2 := HandlerFunc(func(c context.Context, params *json.RawMessage) (interface{}, *Error) {
-		return nil, ErrInternal()
+	h2 := jsonrpc.HandlerFunc(func(c context.Context, params *json.RawMessage) (any, *jsonrpc.Error) {
+		return nil, jsonrpc.ErrInternal()
 	})
 	require.NoError(t, mr.RegisterMethod("bye", h2, nil, nil))
 
 	rec = httptest.NewRecorder()
-	r, err = http.NewRequest("", "", bytes.NewReader([]byte(`{"jsonrpc":"2.0","id":"test","method":"hello","params":{}}`)))
+	r, err = http.NewRequestWithContext(context.Background(), "", "", bytes.NewReader([]byte(`{"jsonrpc":"2.0","id":"test","method":"hello","params":{}}`)))
 	require.NoError(t, err)
 	r.Header.Set("Content-Type", "application/json")
 
 	mr.ServeHTTP(rec, r)
-	res = Response{}
+	res = jsonrpc.Response{}
 	err = json.NewDecoder(rec.Body).Decode(&res)
 	require.NoError(t, err)
 	assert.Nil(t, res.Error)
 	assert.Equal(t, "hello", res.Result)
 
 	rec = httptest.NewRecorder()
-	r, err = http.NewRequest("", "", bytes.NewReader([]byte(`{"jsonrpc":"2.0","id":"test","method":"bye","params":{}}`)))
+	r, err = http.NewRequestWithContext(context.Background(), "", "", bytes.NewReader([]byte(`{"jsonrpc":"2.0","id":"test","method":"bye","params":{}}`)))
 	require.NoError(t, err)
 	r.Header.Set("Content-Type", "application/json")
 
 	mr.ServeHTTP(rec, r)
-	res = Response{}
+	res = jsonrpc.Response{}
 	err = json.NewDecoder(rec.Body).Decode(&res)
 	require.NoError(t, err)
 	assert.NotNil(t, res.Error)

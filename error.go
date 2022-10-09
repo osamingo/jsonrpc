@@ -21,9 +21,9 @@ type (
 
 	// An Error is a wrapper for a JSON interface value.
 	Error struct {
-		Code    ErrorCode   `json:"code"`
-		Message string      `json:"message"`
-		Data    interface{} `json:"data,omitempty"`
+		Code    ErrorCode `json:"code"`
+		Message string    `json:"message"`
+		Data    any       `json:"data,omitempty"`
 	}
 )
 

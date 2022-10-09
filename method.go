@@ -14,8 +14,8 @@ type (
 	// Metadata has method meta data.
 	Metadata struct {
 		Handler Handler
-		Params  interface{}
-		Result  interface{}
+		Params  any
+		Result  any
 	}
 )
 
@@ -44,18 +44,19 @@ func (mr *MethodRepository) TakeMethodMetadata(r *Request) (Metadata, *Error) {
 }
 
 // TakeMethod takes jsonrpc.Func in MethodRepository.
-func (mr *MethodRepository) TakeMethod(r *Request) (Handler, *Error) {
+func (mr *MethodRepository) TakeMethod(r *Request) (Handler, *Error) { //nolint: ireturn
 	md, err := mr.TakeMethodMetadata(r)
 	if err != nil {
 		return nil, err
 	}
+
 	return md.Handler, nil
 }
 
 // RegisterMethod registers jsonrpc.Func to MethodRepository.
-func (mr *MethodRepository) RegisterMethod(method string, h Handler, params, result interface{}) error {
+func (mr *MethodRepository) RegisterMethod(method string, h Handler, params, result any) error {
 	if method == "" || h == nil {
-		return errors.New("jsonrpc: method name and function should not be empty")
+		return errors.New("jsonrpc: method name and function should not be empty") //nolint: goerr113
 	}
 	mr.m.Lock()
 	mr.r[method] = Metadata{
@@ -64,6 +65,7 @@ func (mr *MethodRepository) RegisterMethod(method string, h Handler, params, res
 		Result:  result,
 	}
 	mr.m.Unlock()
+
 	return nil
 }
 
@@ -75,5 +77,6 @@ func (mr *MethodRepository) Methods() map[string]Metadata {
 		ml[k] = md
 	}
 	mr.m.RUnlock()
+
 	return ml
 }

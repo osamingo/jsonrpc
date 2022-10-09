@@ -1,41 +1,48 @@
-package jsonrpc
+package jsonrpc_test
 
 import (
 	"context"
 	"testing"
 
 	"github.com/goccy/go-json"
+	"github.com/osamingo/jsonrpc/v2"
 	"github.com/stretchr/testify/require"
 )
 
 func TestRequestID(t *testing.T) {
+	t.Parallel()
+
 	c := context.Background()
 	id := json.RawMessage("1")
-	c = WithRequestID(c, &id)
+	c = jsonrpc.WithRequestID(c, &id)
 	var pick *json.RawMessage
 	require.NotPanics(t, func() {
-		pick = RequestID(c)
+		pick = jsonrpc.RequestID(c)
 	})
 	require.Equal(t, &id, pick)
 }
 
 func TestMetadata(t *testing.T) {
+	t.Parallel()
+
 	c := context.Background()
-	md := Metadata{Params: Metadata{}}
-	c = WithMetadata(c, md)
-	var pick Metadata
+	md := jsonrpc.Metadata{Params: jsonrpc.Metadata{}}
+	c = jsonrpc.WithMetadata(c, md)
+	var pick jsonrpc.Metadata
 	require.NotPanics(t, func() {
-		pick = GetMetadata(c)
+		pick = jsonrpc.GetMetadata(c)
 	})
 	require.Equal(t, md, pick)
 }
 
 func TestMethodName(t *testing.T) {
+	t.Parallel()
+
 	c := context.Background()
-	c = WithMethodName(c, t.Name())
+	c = jsonrpc.WithMethodName(c, t.Name())
 	var pick string
 	require.NotPanics(t, func() {
-		pick = MethodName(c)
+		pick = jsonrpc.MethodName(c)
 	})
 	require.Equal(t, t.Name(), pick)
 }

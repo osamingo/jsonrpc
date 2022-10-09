@@ -8,12 +8,19 @@ linters-settings:
 linters:
   enable-all: true
   disable:
-    - whitespace
+    - varnamelen
     - wsl
+    - exhaustruct
+    - exhaustivestruct
 
 issues:
   exclude-rules:
     - path: _test\.go
+      text: "does not use range value in test Run"
+      linters:
+        - paralleltest
+    - path: _test\.go
       linters:
         - lll
         - funlen
+        - dupword

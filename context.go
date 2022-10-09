@@ -14,7 +14,9 @@ type (
 
 // RequestID takes request id from context.
 func RequestID(c context.Context) *json.RawMessage {
-	return c.Value(requestIDKey{}).(*json.RawMessage)
+	v, _ := c.Value(requestIDKey{}).(*json.RawMessage)
+
+	return v
 }
 
 // WithRequestID adds request id to context.
@@ -24,7 +26,9 @@ func WithRequestID(c context.Context, id *json.RawMessage) context.Context {
 
 // GetMetadata takes jsonrpc metadata from context.
 func GetMetadata(c context.Context) Metadata {
-	return c.Value(metadataIDKey{}).(Metadata)
+	v, _ := c.Value(metadataIDKey{}).(Metadata)
+
+	return v
 }
 
 // WithMetadata adds jsonrpc metadata to context.
@@ -34,7 +38,9 @@ func WithMetadata(c context.Context, md Metadata) context.Context {
 
 // MethodName takes method name from context.
 func MethodName(c context.Context) string {
-	return c.Value(methodNameKey{}).(string)
+	v, _ := c.Value(methodNameKey{}).(string)
+
+	return v
 }
 
 // WithMethodName adds method name to context.

@@ -16,7 +16,7 @@
 ## Install
 
 ```
-$ go get -u github.com/osamingo/jsonrpc/v2
+$ go get github.com/osamingo/jsonrpc/v2@latest
 ```
 
 ## Usage
@@ -49,7 +49,7 @@ type (
 	}
 )
 
-func (h EchoHandler) ServeJSONRPC(c context.Context, params *json.RawMessage) (interface{}, *jsonrpc.Error) {
+func (h EchoHandler) ServeJSONRPC(c context.Context, params *json.RawMessage) (any, *jsonrpc.Error) {
 
 	var p EchoParams
 	if err := jsonrpc.Unmarshal(params, &p); err != nil {
@@ -61,7 +61,7 @@ func (h EchoHandler) ServeJSONRPC(c context.Context, params *json.RawMessage) (i
 	}, nil
 }
 
-func (h PositionalHandler) ServeJSONRPC(c context.Context, params *json.RawMessage) (interface{}, **jsonrpc.Error) {
+func (h PositionalHandler) ServeJSONRPC(c context.Context, params *json.RawMessage) (any, **jsonrpc.Error) {
 
 	var p PositionalParams
 	if err := jsonrpc.Unmarshal(params, &p); err != nil {
@@ -110,8 +110,8 @@ type (
 	HandleParamsResulter interface {
 		jsonrpc.Handler
 		Name() string
-		Params() interface{}
-		Result() interface{}
+		Params() any
+		Result() any
 	}
 	Servicer interface {
 		MethodName(HandleParamsResulter) string
