@@ -29,6 +29,4 @@ jobs:
         with:
           go-version: ${{ matrix.go }}
       - run: go test -race -covermode=atomic -coverprofile=coverage.txt ./...
-        env:
-          KENALL_AUTHORIZATION_TOKEN: ${{ secrets.KENALL_AUTHORIZATION_TOKEN }}
       - uses: codecov/codecov-action@v2
