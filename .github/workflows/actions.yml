@@ -11,7 +11,7 @@ on:
 jobs:
   lint:
     name: Lint
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - uses: golangci/golangci-lint-action@v3
@@ -19,14 +19,15 @@ jobs:
           version: v1.49.0
   test:
     name: Test
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     strategy:
       matrix:
-        go: [ '1.18.x', '1.19.x' ]
+        go: [ 'stable', 'oldstable' ]
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-go@v2
+      - uses: actions/setup-go@v3
         with:
           go-version: ${{ matrix.go }}
+          cache: true
       - run: go test -race -covermode=atomic -coverprofile=coverage.txt ./...
-      - uses: codecov/codecov-action@v2
+      - uses: codecov/codecov-action@v3
