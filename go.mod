@@ -3,9 +3,9 @@ module github.com/osamingo/jsonrpc/v2
 go 1.18
 
 require (
-	github.com/goccy/go-json v0.9.11
-	github.com/invopop/jsonschema v0.6.0
-	github.com/stretchr/testify v1.8.0
+	github.com/goccy/go-json v0.10.0
+	github.com/invopop/jsonschema v0.7.0
+	github.com/stretchr/testify v1.8.2
 )
 
 require (
