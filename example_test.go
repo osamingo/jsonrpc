@@ -29,7 +29,7 @@ type (
 	}
 )
 
-func (h EchoHandler) ServeJSONRPC(c context.Context, params *json.RawMessage) (interface{}, *jsonrpc.Error) {
+func (h EchoHandler) ServeJSONRPC(_ context.Context, params *json.RawMessage) (interface{}, *jsonrpc.Error) {
 	var p EchoParams
 	if err := jsonrpc.Unmarshal(params, &p); err != nil {
 		return nil, err
@@ -40,7 +40,7 @@ func (h EchoHandler) ServeJSONRPC(c context.Context, params *json.RawMessage) (i
 	}, nil
 }
 
-func (h PositionalHandler) ServeJSONRPC(c context.Context, params *json.RawMessage) (interface{}, *jsonrpc.Error) {
+func (h PositionalHandler) ServeJSONRPC(_ context.Context, params *json.RawMessage) (interface{}, *jsonrpc.Error) {
 	var p PositionalParams
 	if err := jsonrpc.Unmarshal(params, &p); err != nil {
 		return nil, err

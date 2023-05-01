@@ -28,7 +28,6 @@ func (f HandlerFunc) ServeJSONRPC(c context.Context, params *json.RawMessage) (a
 func (mr *MethodRepository) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	rs, batch, err := ParseRequest(r)
 	if err != nil {
-		//nolint: contextcheck
 		err := SendResponse(w, []*Response{
 			{
 				Version: Version,
@@ -48,7 +47,6 @@ func (mr *MethodRepository) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		resp[i] = mr.InvokeMethod(r.Context(), rs[i])
 	}
 
-	//nolint: contextcheck
 	if err := SendResponse(w, resp, batch); err != nil {
 		fmt.Fprint(w, "Failed to encode result objects")
 		w.WriteHeader(http.StatusInternalServerError)
