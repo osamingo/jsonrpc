@@ -66,7 +66,7 @@ func TestMethods(t *testing.T) {
 }
 
 func SampleHandler() *jsonrpc.HandlerFunc {
-	h := jsonrpc.HandlerFunc(func(c context.Context, params *json.RawMessage) (any, *jsonrpc.Error) {
+	h := jsonrpc.HandlerFunc(func(_ context.Context, _ *json.RawMessage) (any, *jsonrpc.Error) {
 		return (any)(nil), nil
 	})
 

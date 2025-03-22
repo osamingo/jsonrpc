@@ -1,7 +1,6 @@
 package jsonrpc_test
 
 import (
-	"context"
 	"testing"
 
 	"github.com/goccy/go-json"
@@ -12,9 +11,8 @@ import (
 func TestRequestID(t *testing.T) {
 	t.Parallel()
 
-	c := context.Background()
 	id := json.RawMessage("1")
-	c = jsonrpc.WithRequestID(c, &id)
+	c := jsonrpc.WithRequestID(t.Context(), &id)
 	var pick *json.RawMessage
 	require.NotPanics(t, func() {
 		pick = jsonrpc.RequestID(c)
@@ -25,9 +23,8 @@ func TestRequestID(t *testing.T) {
 func TestMetadata(t *testing.T) {
 	t.Parallel()
 
-	c := context.Background()
 	md := jsonrpc.Metadata{Params: jsonrpc.Metadata{}}
-	c = jsonrpc.WithMetadata(c, md)
+	c := jsonrpc.WithMetadata(t.Context(), md)
 	var pick jsonrpc.Metadata
 	require.NotPanics(t, func() {
 		pick = jsonrpc.GetMetadata(c)
@@ -38,8 +35,7 @@ func TestMetadata(t *testing.T) {
 func TestMethodName(t *testing.T) {
 	t.Parallel()
 
-	c := context.Background()
-	c = jsonrpc.WithMethodName(c, t.Name())
+	c := jsonrpc.WithMethodName(t.Context(), t.Name())
 	var pick string
 	require.NotPanics(t, func() {
 		pick = jsonrpc.MethodName(c)
