@@ -1,7 +1,6 @@
 package jsonrpc_test
 
 import (
-	"context"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -17,7 +16,7 @@ func TestDebugHandler(t *testing.T) {
 	mr := jsonrpc.NewMethodRepository()
 
 	rec := httptest.NewRecorder()
-	r, err := http.NewRequestWithContext(context.Background(), "", "", nil)
+	r, err := http.NewRequestWithContext(t.Context(), "", "", nil)
 	require.NoError(t, err)
 
 	mr.ServeDebug(rec, r)
@@ -31,7 +30,7 @@ func TestDebugHandler(t *testing.T) {
 	}{}))
 
 	rec = httptest.NewRecorder()
-	r, err = http.NewRequestWithContext(context.Background(), "", "", nil)
+	r, err = http.NewRequestWithContext(t.Context(), "", "", nil)
 	require.NoError(t, err)
 
 	mr.ServeDebug(rec, r)

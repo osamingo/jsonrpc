@@ -1,6 +1,6 @@
 linters-settings:
   errcheck:
-    check-type-asserts: true
+    check-type-assertions: true
     check-blank: true
   misspell:
     locale: US
@@ -11,7 +11,7 @@ linters:
     - varnamelen
     - wsl
     - exhaustruct
-    - exhaustivestruct
+    - depguard
 
 issues:
   exclude-rules:
