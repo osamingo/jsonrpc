@@ -44,7 +44,7 @@ func ParseRequest(r *http.Request) ([]*Request, bool, *Error) {
 		return nil, false, ErrInvalidRequest()
 	}
 
-	buf := bytes.NewBuffer(make([]byte, 0, r.ContentLength))
+	buf := new(bytes.Buffer)
 	if _, err := buf.ReadFrom(r.Body); err != nil {
 		return nil, false, ErrInvalidRequest()
 	}
